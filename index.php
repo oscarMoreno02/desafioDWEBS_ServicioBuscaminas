@@ -15,9 +15,11 @@ unset($argus[0]);
 $json=file_get_contents("php://input");
 $datos=json_decode($json);
 $accion;
+
 if ($requestMethod=='GET'){
     $accion= ControladorMina::Login($datos->usuario,$datos->password);
-
+// añadir mensaje y codigo alternativo para cuando se crea una partida con parametros por url
+//añadir mensaje y codigo de error cuando el usuario no es correcto
     if($accion['codigo']==400){
 
         $cod=$accion['codigo'];
@@ -64,8 +66,9 @@ if ($requestMethod=='POST'){
         $accion=ControladorMina::partidaPendienteExiste($accion['usuario']);
 
             if($accion['codigo']==201){
+                
                 $p=ControladorMina::obtenerPartida($accion['usuario']);
-                $accion=ControladorMina::juegaRonda($partida,$datos->casilla);
+                $accion=ControladorMina::juegaRonda($p,$datos->casilla);
 
             }else{
                 $accion=['codigo'=>404,'mensaje'=>'No se ha encontrado ningun partida'];
@@ -90,26 +93,3 @@ if ($requestMethod=='POST'){
 
 
 
-
-
-
-
-
-
-
-// }
-// if($requestMethod=='POST'){
-//     if(count($argus)>1){
-//         $mensaje='Demasiados argumentos';
-//         $cod=405;
-//     }else{
-//         if((int)$argus[1]==0){
-//             $mensaje='Argumentos mal introducidos';
-//             $cod=411;
-//         }else{
-//             $partida=ControladorMina::JUEGARONDA((int)$argus[1]);
-//         }
-
-//     }
-       
-// }

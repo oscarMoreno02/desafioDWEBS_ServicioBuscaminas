@@ -41,18 +41,28 @@ class ControladorMina{
      return $p;
   }
   public static function juegaRonda($partida,$casilla){
-    if($partida->abrirCasilla()==0){
+    $v=['mensaje'=> 'error al jugar','codigo'=>400];
+        if($partida->abrirCasilla($casilla)==0){
 
-      return ['mensaje'=>'Has perdido la partida','codigo'=>200,'partida'=>$partida->tablero];
+    
+      Conexion::actualizarFinalizada($partida);
+      Conexion::actualizarTableros($partida);
+        $v= ['mensaje'=>'Has perdido la partida','codigo'=>200,'partida'=>$partida->tablero];
 
   }else{
     if($partida->comprobarGanada()){
-      return ['mensaje'=>'Has ganado la partida ','codigo'=>200,'partida'=> $partida->tablero];
+ 
+      $v= ['mensaje'=>'Has ganado la partida ','codigo'=>200,'partida'=> $partida->tablero];
+      Conexion::actualizarFinalizada($partida);
+      Conexion::actualizarTableros($partida);
     }else{
-      return ['mensaje'=>'Continua la partida','codigo'=>200,'partida'=> $partida->oculto];
+      $v= ['mensaje'=>'Continua la partida','codigo'=>200,'partida'=> $partida->oculto];
+     
+      Conexion::actualizarTableros($partida);
     }
   }
-
+  
+  return $v;
 
 }
 }

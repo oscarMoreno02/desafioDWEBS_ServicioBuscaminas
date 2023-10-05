@@ -49,7 +49,8 @@ class Partida{
 
 	public function abrirCasilla($casilla){
 		if($this->tablero[$casilla]==9){
-			$finalizada=-1;
+			$this->terminado=-1;
+			$this->oculto=$this->tablero;
 			return 0;
 		}else{
 			
@@ -60,27 +61,40 @@ class Partida{
 	
 	 public function revelarPistas($casilla){
 		$cercanas=0;
-		if(explode('',$this->tablero[$casilla-1])==9){
+		$vector=str_split($this->tablero);
+		if($vector[$casilla-1]==9){
 			$cercanas++;
 		}
-		if(explode('',$this->tablero[$casilla+1])==9){
+		if($vector[$casilla+1]==9){
 			$cercanas++;
 		}
-		$o=explode('',$this->oculto);
+		$o=str_split($this->oculto);
+		$vector[$casilla]=$cercanas;
 		$o[$casilla]=$cercanas;
+		$this->tablero=implode('',$vector);
 		$this->oculto=implode('',$o);
+		
 	 }
 	 function comprobarGanada(){
 		$i=0;
-		$o=explode('',$this->oculto);
-		$ganada=true;
-		while($ganada && $i<count($o)){
+		$o=str_split($this->oculto);
+		$tablero=str_split($this->tablero);
+		$ganada=false;
+		$c1=0;
+		$c2=0;
+		
+		while($i<count($o)){
 			if($o[$i]=='*'){
-				$ganada=false;
+				$c1++;
+			}
+			if($tablero[$i]=='9'){
+				$c2++;
 			}
 			$i++;
 		}
-		if ($ganada){
+
+		if ($c1==$c2){
+			$ganada=true;
 			$this->terminado=1;
 		}
 		return $ganada;

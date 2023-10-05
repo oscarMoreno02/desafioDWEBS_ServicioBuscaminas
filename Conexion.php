@@ -13,7 +13,7 @@ class Conexion
 
     public static function consultarUsuarioExiste($user,$password){
         $conexion = mysqli_connect(self::$DIRECCION, self::$USER, self::$PSWD, self::$BDNAME);
-
+        
         $consulta =
          "SELECT COUNT(*), id FROM usuario WHERE nombre = '".$user."' AND password = '".$password."' GROUP BY id";
 
@@ -66,18 +66,25 @@ class Conexion
     }
 
    public static function actualizarFinalizada($p){
-
+      
         $conexion = mysqli_connect(self::$DIRECCION, self::$USER, self::$PSWD, self::$BDNAME);
-        $query = "UPDATE partida SET finalizada =". $p->terminada ."WHERE id= ". $p->id.";";
+        $t=$p->terminado;
+        $query = "UPDATE partida SET finalizada = ? WHERE id = ?;";
         $stmt = mysqli_prepare($conexion, $query);
+        mysqli_stmt_bind_param($stmt, "ii", $t, $p->id);
         mysqli_stmt_execute($stmt);
         mysqli_close($conexion);
 
     }
-    public static function actualizarOculto($p){
+
+
+
+
+
+    public static function actualizarTableros($p){
 
         $conexion = mysqli_connect(self::$DIRECCION, self::$USER, self::$PSWD, self::$BDNAME);
-        $query = "UPDATE partida SET oculto =".$p->oculto." WHERE id= ". $p->id.";";
+        $query = "UPDATE partida SET oculto ='".$p->oculto."', tablero = '".$p->tablero."' WHERE id= ". $p->id.";";
         $stmt = mysqli_prepare($conexion, $query);
         mysqli_stmt_execute($stmt);
         mysqli_close($conexion);
