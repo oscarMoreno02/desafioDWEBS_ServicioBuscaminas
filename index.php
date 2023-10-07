@@ -18,18 +18,17 @@ $accion;
 
 if ($requestMethod=='GET'){
     $accion= ControladorMina::Login($datos->usuario,$datos->password);
-// añadir mensaje y codigo alternativo para cuando se crea una partida con parametros por url
-//añadir mensaje y codigo de error cuando el usuario no es correcto
+
     if($accion['codigo']==400){
 
         $cod=$accion['codigo'];
         $mensaje=$accion['mensaje'];
-
+        header("HTTP/1.1 " . $cod.' '.$mensaje);
     }else{
         $accion=ControladorMina::partidaPendienteExiste($accion['usuario']);
         if($accion['codigo']==200){
             if (count($argus)==1){
-             
+                
                 $accion=ControladorMina::nuevaPartida(10,2,$accion['usuario']);
                 $cod=$accion['codigo'];
                 $mensaje=$accion['mensaje'];
@@ -38,6 +37,8 @@ if ($requestMethod=='GET'){
 
             }else{
                 $accion=ControladorMina::nuevaPartida((int)$argus[1],(int)$argus[2],$accion['usuario']);
+                $cod=$accion['codigo'];
+                $mensaje=$accion['mensaje'];
                 header("HTTP/1.1 " . $cod.' '.$mensaje);
                 echo json_encode(['tablero'=>$accion['partida']->oculto]);
             }

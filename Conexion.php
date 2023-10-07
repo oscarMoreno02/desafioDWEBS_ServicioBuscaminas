@@ -20,9 +20,14 @@ class Conexion
         $stmt = mysqli_prepare($conexion, $consulta);
         mysqli_stmt_execute($stmt);
         $resultados = mysqli_stmt_get_result($stmt);
-        $fila = mysqli_fetch_array($resultados);
-        $user=['n'=>$fila[0],'id'=> $fila[1]];
-         return $user;
+        
+        if($fila = mysqli_fetch_array($resultados)){
+            $user=['n'=>$fila[0],'id'=> $fila[1]];
+        }else{
+            $user=['n'=>0];
+        }
+        
+        return $user;
     }
    public static function consultarPartida($user)
     {

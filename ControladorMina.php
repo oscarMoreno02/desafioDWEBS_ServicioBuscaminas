@@ -4,23 +4,26 @@ class ControladorMina{
    public static function login($usuario,$password){
       
       $user=Conexion::consultarUsuarioExiste($usuario,$password);
+      
       if ($user['n']==1)
       {
-           return ['usuario'=>$user['n'],'codigo'=>200];
+           $v= ['usuario'=>$user['n'],'codigo'=>200];
       }else{
-            return ['mensaje'=>'Error de usuario','codigo'=>400];
+           $v=['mensaje'=>'Error de usuario','codigo'=>400];
       }
+      return $v;
    }
    
    
   public static function nuevaPartida($tamaño,$minas,$user){
     $partida=FactoriaPartida::generarPartida($tamaño,$minas,$user);
-
-    if(Conexion::insertar($partida)){
-      return ['codigo'=>200,'partida'=>$partida,'mensaje'=>'Partida creada correctamente','usuario'=>$user];
+    $v=[];
+    if(Conexion::insertar($partida)!=null){
+      $v= ['codigo'=>200,'partida'=>$partida,'mensaje'=>'Partida creada correctamente','usuario'=>$user];
     }else{
-        return ['codigo'=>400,'mensaje'=>'Error al crear la partida'];
+        $v= ['codigo'=>400,'mensaje'=>'Error al crear la partida'];
     }
+      return $v;
    }
 
   public static function partidaPendienteExiste($user){

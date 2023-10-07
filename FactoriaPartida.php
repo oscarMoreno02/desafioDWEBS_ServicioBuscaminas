@@ -3,7 +3,7 @@ class FactoriaPartida
 {
      public static function generarPartida($tamaño, $minas,$user)
      {
-          $tablero = array_fill(0, $tamaño - 1, '*');
+          $tablero = array_fill(0,$tamaño , '*');
           $restantes = 0;
           while ($restantes < $minas) {
                $posicionAleatoria = rand(0, $tamaño - 1);
