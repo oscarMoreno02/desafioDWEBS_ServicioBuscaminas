@@ -4,7 +4,7 @@ require_once './Partida.php';
 require_once './FactoriaPartida.php';
 require_once './ControladorMina.php';
 
-
+// print_r(ControladorMina::mostrarRanking());
 header("Content-Type:application/json");
 $requestMethod = $_SERVER["REQUEST_METHOD"];
 $paths = $_SERVER['REQUEST_URI'];
@@ -25,6 +25,7 @@ if ($requestMethod=='GET'){
         $mensaje=$accion['mensaje'];
         header("HTTP/1.1 " . $cod.' '.$mensaje);
     }else{
+    
         $accion=ControladorMina::partidaPendienteExiste($accion['usuario']);
         if($accion['codigo']==200){
             if (count($argus)==1){
@@ -64,12 +65,13 @@ if ($requestMethod=='POST'){
         $mensaje=$accion['mensaje'];
 
     }else{
+        $user=$accion['usuario'];
         $accion=ControladorMina::partidaPendienteExiste($accion['usuario']);
 
             if($accion['codigo']==201){
                 
                 $p=ControladorMina::obtenerPartida($accion['usuario']);
-                $accion=ControladorMina::juegaRonda($p,$datos->casilla);
+                $accion=ControladorMina::juegaRonda($p,$datos->casilla,$user);
 
             }else{
                 $accion=['codigo'=>404,'mensaje'=>'No se ha encontrado ningun partida'];

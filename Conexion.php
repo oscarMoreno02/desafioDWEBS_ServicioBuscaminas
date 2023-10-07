@@ -113,7 +113,45 @@ class Conexion
         }
         
     }
+
+
+
+    public static function actualizarRankingGanadas($u){
+        
+        $conexion = mysqli_connect(self::$DIRECCION, self::$USER, self::$PSWD, self::$BDNAME);
+        $query = "UPDATE usuario SET partidasGanadas = partidasGanadas + 1 WHERE id= ? ;";
+        $stmt = mysqli_prepare($conexion, $query);
+        mysqli_stmt_bind_param($stmt, "i", $u);
+        mysqli_stmt_execute($stmt);
+        mysqli_close($conexion);
+
+    }
+    public static function actualizarRankingJugadas($u){
+        
+        $conexion = mysqli_connect(self::$DIRECCION, self::$USER, self::$PSWD, self::$BDNAME);
+        $query = "UPDATE usuario SET partidasJugadas = partidasJugadas +1 WHERE id= ? ;";
+        $stmt = mysqli_prepare($conexion, $query);
+        mysqli_stmt_bind_param($stmt, "i", $u);
+        mysqli_stmt_execute($stmt);
+        mysqli_close($conexion);
+
+    }
+    public static function devolverRanking(){
+        $v=[];
+        $conexion = mysqli_connect(self::$DIRECCION, self::$USER, self::$PSWD, self::$BDNAME);
+        $query = "SELECT nombre, partidasGanadas, partidasJugadas FROM usuario ORDER BY partidasGanadas DESC;";
+        $stmt = mysqli_prepare($conexion, $query);
+        mysqli_stmt_execute($stmt);
+        $resultados = mysqli_stmt_get_result($stmt);
+
+        while($fila=mysqli_fetch_array($resultados)){
+            $v[]=['usuario'=>$fila[0],'ganadas'=>$fila[1],'jugadas'=>$fila[2]];
+        }
+
+
+        mysqli_close($conexion);
+        return $v;
+    }
    
 }
-
 
