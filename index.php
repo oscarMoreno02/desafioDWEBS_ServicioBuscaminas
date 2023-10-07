@@ -15,7 +15,7 @@ unset($argus[0]);
 $json=file_get_contents("php://input");
 $datos=json_decode($json);
 $accion;
-
+$mostrar=[];
 if ($requestMethod=='GET'){
     $accion= ControladorMina::Login($datos->usuario,$datos->password);
 
@@ -71,7 +71,13 @@ if ($requestMethod=='POST'){
             if($accion['codigo']==201){
                 
                 $p=ControladorMina::obtenerPartida($accion['usuario']);
-                $accion=ControladorMina::juegaRonda($p,$datos->casilla,$user);
+                if($datos->rendirse!=null){
+                   $accion= ControladorMina::rendicion($user,$p);
+                    
+                }else{
+                    $accion=ControladorMina::juegaRonda($p,$datos->casilla,$user);
+                }
+                
 
             }else{
                 $accion=['codigo'=>404,'mensaje'=>'No se ha encontrado ningun partida'];
