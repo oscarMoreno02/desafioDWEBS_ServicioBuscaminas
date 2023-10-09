@@ -93,7 +93,24 @@ if ($requestMethod=='POST'){
 
 }
 
+if ($requestMethod=='PUT'){
+    $accion= ControladorMina::Login($datos->usuario,$datos->password);
 
+    if($accion['codigo']==400){
+        $cod=$accion['codigo'];
+        $mensaje=$accion['mensaje'];
+    }else{
+        $user=$accion['usuario'];
+        $accion=ControladorMina::validarAdmin($user);
+        if($accion['admin']){
+            //provisional para comprobar si es correcto
+            print_r('Es administrador');
+        }
+    }
+            // header("HTTP/1.1 " . $cod.' '.$mensaje);
+            // echo json_encode(['tablero'=>$accion['partida']]);
+
+}
 
 
 

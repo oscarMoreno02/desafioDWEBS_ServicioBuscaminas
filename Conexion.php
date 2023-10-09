@@ -10,6 +10,23 @@ class Conexion
     static $USER = 'oscar';
     static $PSWD = '123';
     static $BDNAME = 'minas';
+   
+    public static function consultarUsuarioAdministrador($id){
+        $conexion = mysqli_connect(self::$DIRECCION, self::$USER, self::$PSWD, self::$BDNAME);
+        $admin=true;
+        $consulta = "SELECT admin FROM usuario WHERE id = ? ";
+        $stmt = mysqli_prepare($conexion, $consulta);
+        mysqli_stmt_bind_param($stmt, "i", $id);
+        mysqli_stmt_execute($stmt);
+        $resultados = mysqli_stmt_get_result($stmt);
+        $fila = mysqli_fetch_array($resultados);
+        if($fila[0]!=1){
+            $admin=false;
+        }
+        mysqli_close($conexion);
+        return $admin;
+    }
+
 
     public static function consultarUsuarioExiste($user,$password){
         $conexion = mysqli_connect(self::$DIRECCION, self::$USER, self::$PSWD, self::$BDNAME);

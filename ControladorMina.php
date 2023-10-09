@@ -86,4 +86,21 @@ class ControladorMina
     Conexion::actualizarRankingJugadas($user);
     return ['mensaje'=>'Se ha rendido de la partida numero  '.$p->id,'codigo'=>200,'partida'=>$p->tablero];
   }
+
+  public static function validarAdmin($id){
+    $v=[];
+    if(Conexion::consultarUsuarioAdministrador($id)){
+
+      $v=['mensaje'=>"ok",'codigo'=>200,'admin'=>true];
+    }else{
+      $v=['mensaje'=>'No tienes permisos','codigo'=>403,'admin'=>false];
+    }
+    return $v;
+
+  }
+
+
+
+
 }
+
