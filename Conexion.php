@@ -182,5 +182,27 @@ class Conexion
         
     }
    
+    public static function insertarUsuario($u)
+    {
+       
+        $m = '';
+        $conexion = mysqli_connect(self::$DIRECCION, self::$USER, self::$PSWD, self::$BDNAME);
+        $query = "INSERT INTO usuario (password, nombre, admin) VALUES (?,?,?)";
+        
+        $stmt = mysqli_prepare($conexion, $query);
+
+        mysqli_stmt_bind_param($stmt, "ssi",$u->password,$u->nombre, $u->admin);
+
+        try {
+            $m = mysqli_stmt_execute($stmt);
+            $m=['registrado'=>true];
+        } catch (Exception $e) {
+            $m = ['registrado'=>false,'excepcion'=>$e->getMessage()];
+        }
+
+        mysqli_close($conexion);
+        return $m;
+    }
+
 }
 

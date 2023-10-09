@@ -100,6 +100,18 @@ class ControladorMina
   }
 
 
+public static function registrarUsuario($password,$nombre,$admin){
+ 
+   $usuario= FactoriaUsuario::generarNuevoUsuario($password,$nombre,$admin);
+   $registro=Conexion::insertarUsuario($usuario);
+  if($registro['registrado']){
+    $v=['mensaje'=>'Se ha registrado correctamente','codigo'=>201];
+  }else{
+    $v=['mensaje'=>'No se pudo completar la inserccion','codigo'=>400,'excepcion'=>$registro['excepcion']];
+  }
+  return $v;
+}
+
 
 
 }
