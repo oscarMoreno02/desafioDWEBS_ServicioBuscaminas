@@ -111,8 +111,8 @@ class ControladorMina
 
   public static function registrarUsuario($password, $nombre, $admin)
   {
-
-    $usuario = FactoriaUsuario::generarNuevoUsuario($password, $nombre, $admin);
+    $p=md5($password);
+    $usuario = FactoriaUsuario::generarNuevoUsuario($p, $nombre, $admin);
     $registro = Conexion::insertarUsuario($usuario);
     if ($registro['registrado']) {
       $v = ['mensaje' => 'Se ha registrado correctamente', 'codigo' => 201];

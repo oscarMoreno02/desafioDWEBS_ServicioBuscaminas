@@ -1,5 +1,8 @@
-                    GET
-                    
+<--------------------------------------------------------------------------------------------------------------------------->
+                                                GET
+<--------------------------------------------------------------------------------------------------------------------------->
+
+
 <------------------------>
 Ruta: http:://127.0.0.1:9090/
 JSon:
@@ -41,4 +44,33 @@ JSon:
     "password":"xxxx"
 }
 Resolucion: Devolvera los datos de un usuario de la base de datos si el usuario introducido es administrador y el nombre del usuario a consultar existe.
+<------------------------>
+
+
+
+<--------------------------------------------------------------------------------------------------------------------------->
+                                                POST
+<--------------------------------------------------------------------------------------------------------------------------->
+
+
+<------------------------>
+Ruta: http:://127.0.0.1:9090
+JSon:
+{
+    "usuario":"xxxx",
+    "password":"xxxx",
+    "casilla":{numero}
+}
+Resolucion: Si el usuario y la contraseña son correctos, abrira una casilla del tablero oculto y se le mostrara de nuevo el tablero.
+<------------------------>
+
+
+<------------------------>
+Ruta: http:://127.0.0.1:9090/rendirse
+JSon:
+{
+    "usuario":"xxxx",
+    "password":"xxxx"
+}
+Resolucion: Si el usuario y la contraseña son correctos, se rendira la partida dandola por finalizada y mostando la posicion de las minas.
 <------------------------>

@@ -126,7 +126,7 @@ if ($requestMethod == 'POST') {
             if ($accion['codigo'] == 201) {
 
                 $p = ControladorMina::obtenerPartida($accion['usuario']);
-                if ($datos->rendirse != null) {
+                if ($argus[1]== 'rendicion') {
                     $accion = ControladorMina::rendicion($user, $p);
                 } else {
                     $accion = ControladorMina::juegaRonda($p, $datos->casilla, $user);
