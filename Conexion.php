@@ -52,17 +52,16 @@ class Conexion
         $conexion = new mysqli(Constantes::$DIRECCION, Constantes::$USER, Constantes::$PSWD, Constantes::$BDNAME);
         $consulta = "SELECT * FROM partida WHERE idUsuario = ? and finalizada = 0";
         $stmt = $conexion->prepare($consulta);
-        $stmt->bind_param("i", $id);
+        $stmt->bind_param("i", $user);
         $stmt->execute();
         $resultados = $stmt->get_result();
         $fila = $resultados->fetch_array();
 
         $p = new Partida($fila[0], $fila[1], $fila[2], $fila[3], $fila[4]);
 
-
-        return $p;
         $resultados->free_result();
         $conexion->close();
+        return $p;
     }
 
 
@@ -125,8 +124,8 @@ class Conexion
         $conexion = new mysqli(Constantes::$DIRECCION, Constantes::$USER, Constantes::$PSWD, Constantes::$BDNAME);
         $v = [];
         $query = "SELECT COUNT(*) FROM partida WHERE finalizada = 0 and idUsuario= '" . $user . "'";
-        $stmt = mysqli_prepare($conexion, $query);
-
+        $stmt = $conexion->prepare($query);
+        $stmt->execute();
         $resultados = $stmt->get_result();
         $fila = $resultados->fetch_array();
 

@@ -1,4 +1,5 @@
 <?php
+     require_once './Usuario.php';
 class FactoriaUsuario
 {
      public static function generarNuevoUsuario($p, $n, $a)

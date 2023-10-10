@@ -6,6 +6,7 @@ use PHPMailer\PHPMailer\SMTP;
 require_once 'phpmailer/src/Exception.php';
 require_once 'phpmailer/src/PHPMailer.php';
 require_once 'phpmailer/src/SMTP.php';
+require_once './FactoriaUsuario.php';
 
 class ControladorMina
 {

@@ -5,6 +5,7 @@ require_once './FactoriaPartida.php';
 require_once './ControladorMina.php';
 require_once './FactoriaUsuario.php';
 require_once './Usuario.php';
+require_once './Constantes.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
@@ -89,7 +90,6 @@ if ($requestMethod == 'GET') {
                 $p = ControladorMina::obtenerPartida($accion['usuario']);
                 $cod = $accion['codigo'];
                 $mensaje = $accion['mensaje'];
-
                 header("HTTP/1.1 " . $cod . ' ' . $mensaje);
                 echo json_encode(['tablero' => $p->oculto]);
             }
