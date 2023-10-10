@@ -84,35 +84,57 @@ class ControladorMina
   {
     Conexion::rendirse($p);
     Conexion::actualizarRankingJugadas($user);
-    return ['mensaje'=>'Se ha rendido de la partida numero  '.$p->id,'codigo'=>200,'partida'=>$p->tablero];
+    return ['mensaje' => 'Se ha rendido de la partida numero  ' . $p->id, 'codigo' => 200, 'partida' => $p->tablero];
   }
 
-  public static function validarAdmin($id){
-    $v=[];
-    if(Conexion::consultarUsuarioAdministrador($id)){
+  public static function validarAdmin($id)
+  {
+    $v = [];
+    if (Conexion::consultarUsuarioAdministrador($id)) {
 
-      $v=['mensaje'=>"ok",'codigo'=>200,'admin'=>true];
-    }else{
-      $v=['mensaje'=>'No tienes permisos','codigo'=>403,'admin'=>false];
+      $v = ['mensaje' => "ok", 'codigo' => 200, 'admin' => true];
+    } else {
+      $v = ['mensaje' => 'No tienes permisos', 'codigo' => 403, 'admin' => false];
     }
     return $v;
-
   }
 
 
-public static function registrarUsuario($password,$nombre,$admin){
- 
-   $usuario= FactoriaUsuario::generarNuevoUsuario($password,$nombre,$admin);
-   $registro=Conexion::insertarUsuario($usuario);
-  if($registro['registrado']){
-    $v=['mensaje'=>'Se ha registrado correctamente','codigo'=>201];
-  }else{
-    $v=['mensaje'=>'No se pudo completar la inserccion','codigo'=>400,'excepcion'=>$registro['excepcion']];
+  public static function registrarUsuario($password, $nombre, $admin)
+  {
+
+    $usuario = FactoriaUsuario::generarNuevoUsuario($password, $nombre, $admin);
+    $registro = Conexion::insertarUsuario($usuario);
+    if ($registro['registrado']) {
+      $v = ['mensaje' => 'Se ha registrado correctamente', 'codigo' => 201];
+    } else {
+      $v = ['mensaje' => 'No se pudo completar la inserccion', 'codigo' => 400, 'excepcion' => $registro['excepcion']];
+    }
+    return $v;
   }
-  return $v;
+
+  public static function listarUnUsuario($user)
+  {
+    $u = Conexion::consultarUsuarioPorNombre($user);
+    $v = [];
+    if ($u['excepcion']) {
+      $v = ['codigo' => 404, 'mensaje' => 'no encontrado', 'excepcion' => $u['excepcion']];
+    } else {
+      $v = ['codigo' => 200, 'mensaje' => 'Encontrado', 'usuario' => $u['usuario']];
+    }
+    return $v;
+  }
+
+  public static function listarTodosUsuarios()
+  {
+    $u = Conexion::consultarTodosUsuario();
+    $v=[];
+    if($u['excepcion']){
+      $v=['codigo'=>500,'mensaje'=>'Error de servidor','excepcion'=>$u['excepcion']];
+
+    }else{
+      $v=['codigo'=>200,'mensaje'=>'Encontrado correctamente','usuarios'=>$u['usuarios']];
+    }
+    return $v;
+  }
 }
-
-
-
-}
-

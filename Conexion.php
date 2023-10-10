@@ -203,6 +203,48 @@ class Conexion
         mysqli_close($conexion);
         return $m;
     }
+    static function consultarUsuarioPorNombre($user){
+        $conexion = mysqli_connect(self::$DIRECCION, self::$USER, self::$PSWD, self::$BDNAME);
+        $consulta = "SELECT * FROM usuario WHERE nombre= ? ";
+        $stmt = mysqli_prepare($conexion, $consulta);
+        mysqli_stmt_bind_param($stmt, "i", $user);
+        mysqli_stmt_execute($stmt);
+        $resultados = mysqli_stmt_get_result($stmt);
+        
+        $v=[];
+        try{
+            $fila = mysqli_fetch_array($resultados);
+            $u = new Usuario($fila[0],$fila[1],$fila[2],$fila[4],$fila[3],$fila[5]);
+            $v=['usuario'=>$u];
+        }catch(Exception $e){
+            $v['excepcion']=$e->getMessage();
+        }
+        mysqli_close($conexion);
+        return $v;
+
+    }
+    static function consultarTodosUsuario(){
+        $conexion = mysqli_connect(self::$DIRECCION, self::$USER, self::$PSWD, self::$BDNAME);
+        $consulta = "SELECT * FROM usuario";
+        $stmt = mysqli_prepare($conexion, $consulta);
+        
+        mysqli_stmt_execute($stmt);
+        $resultados = mysqli_stmt_get_result($stmt);
+        $v=[];
+        try{
+        while($fila = mysqli_fetch_array($resultados)){
+
+            $u = new Usuario($fila[0],$fila[1],$fila[2],$fila[4],$fila[3],$fila[5]);
+            $usuarios[]=$u;
+        }
+        $v=['usuarios'=>$usuarios];
+    }catch(Exception $e){
+        $v=['excepcion'=>$e->getMessage()];
+    }
+        mysqli_close($conexion);
+        return $v;
+
+    }
 
 }
 

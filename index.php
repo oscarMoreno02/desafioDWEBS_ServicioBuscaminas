@@ -26,30 +26,67 @@ if ($requestMethod == 'GET') {
         $mensaje = $accion['mensaje'];
         header("HTTP/1.1 " . $cod . ' ' . $mensaje);
     } else {
+        $user = $accion['usuario'];
+        if ($argus[1] == 'consultar') {
 
-        $accion = ControladorMina::partidaPendienteExiste($accion['usuario']);
-        if ($accion['codigo'] == 200) {
-            if (count($argus) == 1) {
+            $accion = ControladorMina::validarAdmin($user);
 
-                $accion = ControladorMina::nuevaPartida(10, 2, $accion['usuario']);
-                $cod = $accion['codigo'];
-                $mensaje = $accion['mensaje'];
-                header("HTTP/1.1 " . $cod . ' ' . $mensaje);
-                echo json_encode(['tablero' => $accion['partida']->oculto]);
-            } else {
-                $accion = ControladorMina::nuevaPartida((int)$argus[1], (int)$argus[2], $accion['usuario']);
-                $cod = $accion['codigo'];
-                $mensaje = $accion['mensaje'];
-                header("HTTP/1.1 " . $cod . ' ' . $mensaje);
-                echo json_encode(['tablero' => $accion['partida']->oculto]);
+            if ($accion['admin']) {
+                if (count($argus) > 1) {
+                    $accion = ControladorMina::listarUnUsuario($argus[2]);
+                    if ($accion['excepcion']) {
+                        $cod = $accion['codigo'];
+                        $mensaje = $accion['mensaje'];
+                        header("HTTP/1.1 " . $cod . ' ' . $mensaje);
+                        echo json_encode(['excepcion' => $accion['excepcion']]);
+
+                    } else {
+                        $cod = $accion['codigo'];
+                        $mensaje = $accion['mensaje'];
+                        header("HTTP/1.1 " . $cod . ' ' . $mensaje);
+                        echo json_encode(['excepcion' => $accion['usuario']]);
+                    }
+                } else {
+                    $accion = ControladorMina::listarTodosUsuarios();
+                    if ($accion['excepcion']) {
+                        $cod = $accion['codigo'];
+                        $mensaje = $accion['mensaje'];
+                        header("HTTP/1.1 " . $cod . ' ' . $mensaje);
+                        echo json_encode(['excepcion' => $accion['excepcion']]);
+
+                    } else {
+                        $cod = $accion['codigo'];
+                        $mensaje = $accion['mensaje'];
+                        header("HTTP/1.1 " . $cod . ' ' . $mensaje);
+                        echo json_encode(['excepcion' => $accion['usuarios']]);
+                    }
+                }
             }
         } else {
-            $p = ControladorMina::obtenerPartida($accion['usuario']);
-            $cod = $accion['codigo'];
-            $mensaje = $accion['mensaje'];
+            $accion = ControladorMina::partidaPendienteExiste($accion['usuario']);
+            if ($accion['codigo'] == 200) {
+                if (count($argus) == 1) {
 
-            header("HTTP/1.1 " . $cod . ' ' . $mensaje);
-            echo json_encode(['tablero' => $p->oculto]);
+                    $accion = ControladorMina::nuevaPartida(10, 2, $accion['usuario']);
+                    $cod = $accion['codigo'];
+                    $mensaje = $accion['mensaje'];
+                    header("HTTP/1.1 " . $cod . ' ' . $mensaje);
+                    echo json_encode(['tablero' => $accion['partida']->oculto]);
+                } else {
+                    $accion = ControladorMina::nuevaPartida((int)$argus[1], (int)$argus[2], $accion['usuario']);
+                    $cod = $accion['codigo'];
+                    $mensaje = $accion['mensaje'];
+                    header("HTTP/1.1 " . $cod . ' ' . $mensaje);
+                    echo json_encode(['tablero' => $accion['partida']->oculto]);
+                }
+            } else {
+                $p = ControladorMina::obtenerPartida($accion['usuario']);
+                $cod = $accion['codigo'];
+                $mensaje = $accion['mensaje'];
+
+                header("HTTP/1.1 " . $cod . ' ' . $mensaje);
+                echo json_encode(['tablero' => $p->oculto]);
+            }
         }
     }
 }
