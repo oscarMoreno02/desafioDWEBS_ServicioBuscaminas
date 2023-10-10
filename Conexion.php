@@ -217,7 +217,7 @@ class Conexion
         $conexion = new mysqli(Constantes::$DIRECCION, Constantes::$USER, Constantes::$PSWD, Constantes::$BDNAME);
         $consulta = "SELECT * FROM usuario WHERE nombre= ? ";
         $stmt = $conexion->prepare($consulta);
-        $stmt->bind_param("i", $user);
+        $stmt->bind_param("s", $user);
         $stmt->execute();
         $resultados = $stmt->get_result();
 
