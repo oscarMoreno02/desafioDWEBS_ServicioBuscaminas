@@ -25,9 +25,11 @@ unset($argus[0]);
 $json = file_get_contents("php://input");
 $datos = json_decode($json);
 $accion;
-$mostrar = [];
+
 if ($requestMethod == 'GET') {
-    $accion = ControladorMina::Login($datos->usuario, $datos->password);
+    $u=$datos->usuario;
+    $p=$datos->password;
+    $accion = ControladorMina::Login($u,$p);
 
     if ($accion['codigo'] == 400) {
 
@@ -137,7 +139,7 @@ if ($requestMethod == 'POST') {
         }
     }
 
-    // echo json_encode(['tablero' => $accion['partida']]);
+
 
 
 }
@@ -149,10 +151,11 @@ if ($requestMethod == 'PUT') {
         $accion = ControladorMina::recuperarCuenta($email, $u);
     } else {
         $accion = ControladorMina::Login($datos->usuario, $datos->password);
-
+        
         if ($accion['codigo'] == 400) {
             $cod = $accion['codigo'];
             $mensaje = $accion['mensaje'];
+           
         } else {
             $user = $accion['usuario'];
             $accion = ControladorMina::validarAdmin($user);

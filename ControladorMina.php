@@ -14,6 +14,7 @@ class ControladorMina
   public static function login($usuario, $password)
   {
     $p = md5($password);
+   
     $user = Conexion::consultarUsuarioExiste($usuario, $p);
 
     if ($user['n'] == 1) {
