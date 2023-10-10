@@ -5,6 +5,13 @@ require_once './FactoriaPartida.php';
 require_once './ControladorMina.php';
 require_once './FactoriaUsuario.php';
 require_once './Usuario.php';
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+
+require_once 'phpmailer/src/Exception.php';
+require_once 'phpmailer/src/PHPMailer.php';
+require_once 'phpmailer/src/SMTP.php';
+
 // print_r(ControladorMina::mostrarRanking());
 header("Content-Type:application/json");
 $requestMethod = $_SERVER["REQUEST_METHOD"];
@@ -146,9 +153,17 @@ if ($requestMethod == 'PUT') {
         $user = $accion['usuario'];
         $accion = ControladorMina::validarAdmin($user);
         if ($accion['admin']) {
-            //provisional para comprobar si es correcto
-            print_r('Es administrador');
+            $u=$datos->usuarioUpdate;
+            $p=$datos->passwordUpdate;
+         
+            $accion=ControladorMina::cambiarPassword($u,$p);
+
         }
+
+            $cod=$accion['codigo'];
+            $mensaje=$accion['mensaje'];
+            header("HTTP/1.1 " . $cod.' '.$mensaje);
+           
     }
     // header("HTTP/1.1 " . $cod.' '.$mensaje);
     // echo json_encode(['tablero'=>$accion['partida']]);

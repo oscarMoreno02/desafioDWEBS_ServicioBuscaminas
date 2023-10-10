@@ -4,8 +4,8 @@ class ControladorMina
 
   public static function login($usuario, $password)
   {
-
-    $user = Conexion::consultarUsuarioExiste($usuario, $password);
+    $p=md5($password);
+    $user = Conexion::consultarUsuarioExiste($usuario, $p);
 
     if ($user['n'] == 1) {
       $v = ['usuario' => $user['n'], 'codigo' => 200];
@@ -136,5 +136,19 @@ class ControladorMina
       $v=['codigo'=>200,'mensaje'=>'Encontrado correctamente','usuarios'=>$u['usuarios']];
     }
     return $v;
+  }
+
+  public static function cambiarPassword($user,$password){
+      $v=[];
+      $p=md5($password);
+      $u=Conexion::updatePassword($user,$p);
+    if($u['update']){
+      $u=['mensaje'=>'Modificado correctamente','codigo'=>200];
+    }else{
+
+      $u=['codigo'=>412,'mensaje'=>'Error en la modificacion','excepcion'=>$u['excepcion']];
+
+    }
+    return $u;
   }
 }
