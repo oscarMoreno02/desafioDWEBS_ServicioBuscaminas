@@ -264,4 +264,21 @@ class Conexion
         mysqli_close($conexion);
         return $v;
     }
+    public static function deleteUsuario($user){
+        $v=[];
+        $conexion = mysqli_connect(self::$DIRECCION, self::$USER, self::$PSWD, self::$BDNAME);
+        $query = "DELETE FROM usuario  WHERE nombre = ? ;";
+        $stmt = mysqli_prepare($conexion, $query);
+        mysqli_stmt_bind_param($stmt, "s", $user);
+        try{
+            mysqli_stmt_execute($stmt);
+            $v=['delete'=>true];
+        }catch(Exception $e){
+            $v=['delete'=>false,'excepcion'=>$e->getMessage()];
+        }
+
+        mysqli_close($conexion);
+        return $v;
+
+    }
 }

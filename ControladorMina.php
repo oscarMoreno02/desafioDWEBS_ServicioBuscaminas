@@ -151,4 +151,16 @@ class ControladorMina
     }
     return $u;
   }
+  public static function eliminarUsuario($user){
+    $u = Conexion::deleteUsuario($user);
+    $v = [];
+    if ($u['delete'==true]) {
+      $v = ['codigo' => 404, 'mensaje' => 'Error al eliminar', 'excepcion' => $u['excepcion']];
+    } else {
+      $v = ['codigo' => 200, 'mensaje' => 'Usuario Eliminado', 'usuario' => $u['usuario']];
+    }
+    return $v;
+
+  }
+
 }

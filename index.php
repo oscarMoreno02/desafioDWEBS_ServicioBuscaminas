@@ -169,3 +169,28 @@ if ($requestMethod == 'PUT') {
     // echo json_encode(['tablero'=>$accion['partida']]);
 
 }
+if ($requestMethod == 'DELETE') {
+    $accion = ControladorMina::Login($datos->usuario, $datos->password);
+
+    if ($accion['codigo'] == 400) {
+        $cod = $accion['codigo'];
+        $mensaje = $accion['mensaje'];
+    } else {
+        $user = $accion['usuario'];
+        $accion = ControladorMina::validarAdmin($user);
+        if ($accion['admin']) {
+            $u=$datos->usuarioDelete;
+        
+            $accion=ControladorMina::eliminarUsuario($u);
+
+        }
+
+            $cod=$accion['codigo'];
+            $mensaje=$accion['mensaje'];
+            header("HTTP/1.1 " . $cod.' '.$mensaje);
+           
+    }
+    // header("HTTP/1.1 " . $cod.' '.$mensaje);
+    // echo json_encode(['tablero'=>$accion['partida']]);
+
+}
