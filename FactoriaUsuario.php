@@ -14,6 +14,20 @@ class FactoriaUsuario
           return new Usuario($i,$p,$n,$a,$pj,$pg);
      }
 
-
+     public static function generarPasswordAleatoriamente(){
+          $letras=['a','e','i','o','u'];
+          $longitud=rand(7,10);
+          $password=[];
+          for ($i=0;$i<=$longitud;$i++){
+              $n=rand(0,100);
+              if($n%2==0){
+                $password[]=rand(0,9);
+              }else{
+                $password[]=$letras[rand(0,count($letras)-1)];
+              }
+          }
+         
+          return implode('',$password);
+        }
 
 }

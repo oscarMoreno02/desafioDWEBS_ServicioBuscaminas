@@ -5,6 +5,7 @@ require_once './FactoriaPartida.php';
 require_once './ControladorMina.php';
 require_once './FactoriaUsuario.php';
 require_once './Usuario.php';
+
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 
@@ -46,7 +47,6 @@ if ($requestMethod == 'GET') {
                         $mensaje = $accion['mensaje'];
                         header("HTTP/1.1 " . $cod . ' ' . $mensaje);
                         echo json_encode(['excepcion' => $accion['excepcion']]);
-
                     } else {
                         $cod = $accion['codigo'];
                         $mensaje = $accion['mensaje'];
@@ -60,7 +60,6 @@ if ($requestMethod == 'GET') {
                         $mensaje = $accion['mensaje'];
                         header("HTTP/1.1 " . $cod . ' ' . $mensaje);
                         echo json_encode(['excepcion' => $accion['excepcion']]);
-
                     } else {
                         $cod = $accion['codigo'];
                         $mensaje = $accion['mensaje'];
@@ -144,31 +143,33 @@ if ($requestMethod == 'POST') {
 }
 
 if ($requestMethod == 'PUT') {
-    $accion = ControladorMina::Login($datos->usuario, $datos->password);
+    if ($argus[1] == 'recuperacion') {
+        $email=$datos->email;
+        $u=$datos->usuario;
+        $accion=ControladorMina::recuperarCuenta($email,$u);
+    } else{
+        $accion = ControladorMina::Login($datos->usuario, $datos->password);
 
     if ($accion['codigo'] == 400) {
         $cod = $accion['codigo'];
         $mensaje = $accion['mensaje'];
     } else {
         $user = $accion['usuario'];
-        $accion = ControladorMina::validarAdmin($user);
-        if ($accion['admin']) {
-            $u=$datos->usuarioUpdate;
-            $p=$datos->passwordUpdate;
-         
-            $accion=ControladorMina::cambiarPassword($u,$p);
+            $accion = ControladorMina::validarAdmin($user);
+            if ($accion['admin']) {
+                $u = $datos->usuarioUpdate;
+                $p = $datos->passwordUpdate;
+
+                $accion = ControladorMina::cambiarPassword($u, $p);
+            }
+    }
 
         }
-
-            $cod=$accion['codigo'];
-            $mensaje=$accion['mensaje'];
-            header("HTTP/1.1 " . $cod.' '.$mensaje);
-           
-    }
-    // header("HTTP/1.1 " . $cod.' '.$mensaje);
-    // echo json_encode(['tablero'=>$accion['partida']]);
-
+        $cod = $accion['codigo'];
+        $mensaje = $accion['mensaje'];
+        header("HTTP/1.1 " . $cod . ' ' . $mensaje);
 }
+
 if ($requestMethod == 'DELETE') {
     $accion = ControladorMina::Login($datos->usuario, $datos->password);
 
@@ -179,18 +180,15 @@ if ($requestMethod == 'DELETE') {
         $user = $accion['usuario'];
         $accion = ControladorMina::validarAdmin($user);
         if ($accion['admin']) {
-            $u=$datos->usuarioDelete;
-        
-            $accion=ControladorMina::eliminarUsuario($u);
+            $u = $datos->usuarioDelete;
 
+            $accion = ControladorMina::eliminarUsuario($u);
         }
 
-            $cod=$accion['codigo'];
-            $mensaje=$accion['mensaje'];
-            header("HTTP/1.1 " . $cod.' '.$mensaje);
-           
+        $cod = $accion['codigo'];
+        $mensaje = $accion['mensaje'];
+        header("HTTP/1.1 " . $cod . ' ' . $mensaje);
     }
-    // header("HTTP/1.1 " . $cod.' '.$mensaje);
-    // echo json_encode(['tablero'=>$accion['partida']]);
-
 }
+
+

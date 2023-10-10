@@ -217,7 +217,7 @@ class Conexion
         $v = [];
         try {
             $fila = mysqli_fetch_array($resultados);
-            $u = new Usuario($fila[0], $fila[1], $fila[2], $fila[4], $fila[3], $fila[5]);
+            $u =  new Usuario($fila[0], $fila[1], $fila[2],$fila[5], $fila[3], $fila[4]);
             $v = ['usuario' => $u];
         } catch (Exception $e) {
             $v['excepcion'] = $e->getMessage();
@@ -237,7 +237,7 @@ class Conexion
         try {
             while ($fila = mysqli_fetch_array($resultados)) {
 
-                $u = new Usuario($fila[0], $fila[1], $fila[2], $fila[4], $fila[3], $fila[5]);
+                $u = new Usuario($fila[0], $fila[1], $fila[2],$fila[5], $fila[3], $fila[4]);
                 $usuarios[] = $u;
             }
             $v = ['usuarios' => $usuarios];
@@ -281,4 +281,5 @@ class Conexion
         return $v;
 
     }
+   
 }

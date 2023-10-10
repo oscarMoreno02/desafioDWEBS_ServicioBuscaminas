@@ -1,10 +1,18 @@
 <?php
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+
+require_once 'phpmailer/src/Exception.php';
+require_once 'phpmailer/src/PHPMailer.php';
+require_once 'phpmailer/src/SMTP.php';
+
 class ControladorMina
 {
 
   public static function login($usuario, $password)
   {
-    $p=md5($password);
+    $p = md5($password);
     $user = Conexion::consultarUsuarioExiste($usuario, $p);
 
     if ($user['n'] == 1) {
@@ -128,39 +136,73 @@ class ControladorMina
   public static function listarTodosUsuarios()
   {
     $u = Conexion::consultarTodosUsuario();
-    $v=[];
-    if($u['excepcion']){
-      $v=['codigo'=>500,'mensaje'=>'Error de servidor','excepcion'=>$u['excepcion']];
-
-    }else{
-      $v=['codigo'=>200,'mensaje'=>'Encontrado correctamente','usuarios'=>$u['usuarios']];
+    $v = [];
+    if ($u['excepcion']) {
+      $v = ['codigo' => 500, 'mensaje' => 'Error de servidor', 'excepcion' => $u['excepcion']];
+    } else {
+      $v = ['codigo' => 200, 'mensaje' => 'Encontrado correctamente', 'usuarios' => $u['usuarios']];
     }
     return $v;
   }
 
-  public static function cambiarPassword($user,$password){
-      $v=[];
-      $p=md5($password);
-      $u=Conexion::updatePassword($user,$p);
-    if($u['update']){
-      $u=['mensaje'=>'Modificado correctamente','codigo'=>200];
-    }else{
+  public static function cambiarPassword($user, $password)
+  {
+    $v = [];
+    $p = md5($password);
+    $u = Conexion::updatePassword($user, $p);
+    if ($u['update']) {
+      $u = ['mensaje' => 'Modificado correctamente', 'codigo' => 200];
+    } else {
 
-      $u=['codigo'=>412,'mensaje'=>'Error en la modificacion','excepcion'=>$u['excepcion']];
-
+      $u = ['codigo' => 412, 'mensaje' => 'Error en la modificacion', 'excepcion' => $u['excepcion']];
     }
     return $u;
   }
-  public static function eliminarUsuario($user){
+  public static function eliminarUsuario($user)
+  {
     $u = Conexion::deleteUsuario($user);
     $v = [];
-    if ($u['delete'==true]) {
+    if ($u['delete' == true]) {
       $v = ['codigo' => 404, 'mensaje' => 'Error al eliminar', 'excepcion' => $u['excepcion']];
     } else {
       $v = ['codigo' => 200, 'mensaje' => 'Usuario Eliminado', 'usuario' => $u['usuario']];
     }
     return $v;
-
   }
+  public static function recuperarCuenta($email, $user)
+  {
+    $newPassword = FactoriaUsuario::generarPasswordAleatoriamente();
+    $v = self::cambiarPassword($user, $newPassword);
+    if ($v['codigo']==200) {
+      try {
+        $mail = new PHPMailer();
 
+
+        $mail->isSMTP();
+        $mail->Host       = 'smtp.gmail.com';
+        $mail->SMTPAuth   = true;
+        $mail->Username   = 'auxiliardaw2@gmail.com';
+        $mail->Password   = 'gaxrwhgytqclfiyd';
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+        $mail->Port       = 465;
+
+        $mail->setFrom('auxiliardaw2@gmail.com', 'Fernando Aranzabe');
+
+        $mail->addAddress($email, $user);
+
+        $mail->isHTML(true);
+        $mail->Subject = 'Recuperacion de cuenta';
+        $mail->Body    = 'Usuario: ' . $user . ' su nueva contraseña es: <b>' . $newPassword . '</b>';
+        $mail->AltBody = 'Usuario: ' . $user . ' su nueva contraseña es:' . $newPassword ;
+
+        $mail->send();
+        $v = ['mensaje' => 'El mensaje ha sido enviado', 'codigo' => 200];
+      } catch (Exception $e) {
+        $v = ['mensaje' => 'No se pudo enviar el mensaje. Error de correo: {$mail->ErrorInfo}', 'codigo' => 404];
+      }
+    }else{
+      $v=['mensaje'=>'Error al procesar la solicitud','codigo'=>404];
+    }
+    return $v;
+  }
 }
