@@ -173,7 +173,7 @@ class ControladorMina
   {
     $newPassword = FactoriaUsuario::generarPasswordAleatoriamente();
     $v = self::cambiarPassword($user, $newPassword);
-    if ($v['codigo']==200) {
+    if ($v['codigo'] == 200) {
       try {
         $mail = new PHPMailer();
 
@@ -193,15 +193,15 @@ class ControladorMina
         $mail->isHTML(true);
         $mail->Subject = 'Recuperacion de cuenta';
         $mail->Body    = 'Usuario: ' . $user . ' su nueva contraseña es: <b>' . $newPassword . '</b>';
-        $mail->AltBody = 'Usuario: ' . $user . ' su nueva contraseña es:' . $newPassword ;
+        $mail->AltBody = 'Usuario: ' . $user . ' su nueva contraseña es:' . $newPassword;
 
         $mail->send();
         $v = ['mensaje' => 'El mensaje ha sido enviado', 'codigo' => 200];
       } catch (Exception $e) {
         $v = ['mensaje' => 'No se pudo enviar el mensaje. Error de correo: {$mail->ErrorInfo}', 'codigo' => 404];
       }
-    }else{
-      $v=['mensaje'=>'Error al procesar la solicitud','codigo'=>404];
+    } else {
+      $v = ['mensaje' => 'Error al procesar la solicitud', 'codigo' => 404];
     }
     return $v;
   }

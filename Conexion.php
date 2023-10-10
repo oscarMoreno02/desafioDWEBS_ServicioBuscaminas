@@ -13,58 +13,60 @@ class Conexion
 
     public static function consultarUsuarioAdministrador($id)
     {
-        $conexion = mysqli_connect(self::$DIRECCION, self::$USER, self::$PSWD, self::$BDNAME);
+        $conexion = new mysqli(self::$DIRECCION, self::$USER, self::$PSWD, self::$BDNAME);
         $admin = true;
         $consulta = "SELECT admin FROM usuario WHERE id = ? ";
-        $stmt = mysqli_prepare($conexion, $consulta);
-        mysqli_stmt_bind_param($stmt, "i", $id);
-        mysqli_stmt_execute($stmt);
-        $resultados = mysqli_stmt_get_result($stmt);
-        $fila = mysqli_fetch_array($resultados);
+        $stmt = $conexion->prepare($consulta);
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $resultados = $stmt->get_result();
+        $fila = $resultados->fetch_array();
         if ($fila[0] != 1) {
             $admin = false;
         }
-        mysqli_close($conexion);
+        $resultados->free_result();
+        $conexion->close();
         return $admin;
     }
 
 
     public static function consultarUsuarioExiste($user, $password)
     {
-        $conexion = mysqli_connect(self::$DIRECCION, self::$USER, self::$PSWD, self::$BDNAME);
+        $conexion = new mysqli(self::$DIRECCION, self::$USER, self::$PSWD, self::$BDNAME);
 
         $consulta =
-            "SELECT COUNT(*), id FROM usuario WHERE nombre = '" . $user . "' AND password = '" . $password . "' GROUP BY id";
+            "SELECT COUNT(*), id FROM usuario WHERE nombre = ? AND password = ? GROUP BY id";
 
-        $stmt = mysqli_prepare($conexion, $consulta);
-        mysqli_stmt_execute($stmt);
-        $resultados = mysqli_stmt_get_result($stmt);
+        $stmt = $conexion->prepare($consulta);
+        $stmt->bind_param("ss", $user, $password);
+        $stmt->execute();
+        $resultados = $stmt->get_result();
 
-        if ($fila = mysqli_fetch_array($resultados)) {
+        if ($fila = $resultados->fetch_array()) {
             $user = ['n' => $fila[0], 'id' => $fila[1]];
         } else {
             $user = ['n' => 0];
         }
-
+        $resultados->free_result();
+        $conexion->close();
         return $user;
     }
     public static function consultarPartida($user)
     {
-        $conexion = mysqli_connect(self::$DIRECCION, self::$USER, self::$PSWD, self::$BDNAME);
+        $conexion = new mysqli(self::$DIRECCION, self::$USER, self::$PSWD, self::$BDNAME);
         $consulta = "SELECT * FROM partida WHERE idUsuario = ? and finalizada = 0";
-        $stmt = mysqli_prepare($conexion, $consulta);
-        mysqli_stmt_bind_param($stmt, "i", $user);
-        mysqli_stmt_execute($stmt);
-        $resultados = mysqli_stmt_get_result($stmt);
-        $fila = mysqli_fetch_array($resultados);
+        $stmt = $conexion->prepare($consulta);
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $resultados = $stmt->get_result();
+        $fila = $resultados->fetch_array();
 
         $p = new Partida($fila[0], $fila[1], $fila[2], $fila[3], $fila[4]);
 
 
-
-
-        mysqli_close($conexion);
         return $p;
+        $resultados->free_result();
+        $conexion->close();
     }
 
 
@@ -72,33 +74,35 @@ class Conexion
     public static function insertar($p)
     {
         $m = '';
-        $conexion = mysqli_connect(self::$DIRECCION, self::$USER, self::$PSWD, self::$BDNAME);
+        $conexion = new mysqli(self::$DIRECCION, self::$USER, self::$PSWD, self::$BDNAME);
         $query = "INSERT INTO partida (idUsuario,tablero,oculto,finalizada) VALUES (?,?,?,?)";
 
-        $stmt = mysqli_prepare($conexion, $query);
+        $stmt = $conexion->prepare($query);
 
-        mysqli_stmt_bind_param($stmt, "issi", $p->idUsuario, $p->tablero, $p->oculto, $p->terminado);
+        $stmt->bind_param("issi", $p->idUsuario, $p->tablero, $p->oculto, $p->terminado);
 
         try {
-            $m = mysqli_stmt_execute($stmt);
+            $m = $stmt->execute();
         } catch (Exception $e) {
             $m = null;
         }
 
-        mysqli_close($conexion);
+
+        $conexion->close();
         return $m;
     }
 
     public static function actualizarFinalizada($p)
     {
 
-        $conexion = mysqli_connect(self::$DIRECCION, self::$USER, self::$PSWD, self::$BDNAME);
+        $conexion = new mysqli(self::$DIRECCION, self::$USER, self::$PSWD, self::$BDNAME);
         $t = $p->terminado;
         $query = "UPDATE partida SET finalizada = ? WHERE id = ?;";
-        $stmt = mysqli_prepare($conexion, $query);
-        mysqli_stmt_bind_param($stmt, "ii", $t, $p->id);
-        mysqli_stmt_execute($stmt);
-        mysqli_close($conexion);
+        $stmt = $conexion->prepare($query);
+        $stmt->bind_param("ii", $t, $p->id);
+        $stmt->execute();
+
+        $conexion->close();
     }
 
 
@@ -108,29 +112,35 @@ class Conexion
     public static function actualizarTableros($p)
     {
 
-        $conexion = mysqli_connect(self::$DIRECCION, self::$USER, self::$PSWD, self::$BDNAME);
-        $query = "UPDATE partida SET oculto ='" . $p->oculto . "', tablero = '" . $p->tablero . "' WHERE id= " . $p->id . ";";
-        $stmt = mysqli_prepare($conexion, $query);
-        mysqli_stmt_execute($stmt);
-        mysqli_close($conexion);
+        $conexion = new mysqli(self::$DIRECCION, self::$USER, self::$PSWD, self::$BDNAME);
+        $query = "UPDATE partida SET oculto = ?, tablero = ? WHERE id= ?;";
+        $stmt = $conexion->prepare($query);
+        $stmt->bind_param("ssi", $p->oculto, $p->tablero, $p->id);
+        $stmt->execute();
+
+        $conexion->close();
     }
 
 
 
     public static function consultarTerminadas($user)
     {
-        $conexion = mysqli_connect(self::$DIRECCION, self::$USER, self::$PSWD, self::$BDNAME);
+        $conexion = new mysqli(self::$DIRECCION, self::$USER, self::$PSWD, self::$BDNAME);
+        $v = [];
         $query = "SELECT COUNT(*) FROM partida WHERE finalizada = 0 and idUsuario= '" . $user . "'";
         $stmt = mysqli_prepare($conexion, $query);
 
-        mysqli_stmt_execute($stmt);
-        $resultados = mysqli_stmt_get_result($stmt);
-        $fila = mysqli_fetch_array($resultados);
+        $resultados = $stmt->get_result();
+        $fila = $resultados->fetch_array();
+
         if ($fila[0] == 1) {
-            return ['contador' => $fila[0]];
+            $v = ['contador' => $fila[0]];
         } else {
-            return ['contador' => $fila[0]];
+            $v = ['contador' => $fila[0]];
         }
+        $resultados->free_result();
+        $conexion->close();
+        return $v;
     }
 
 
@@ -138,148 +148,151 @@ class Conexion
     public static function actualizarRankingGanadas($u)
     {
 
-        $conexion = mysqli_connect(self::$DIRECCION, self::$USER, self::$PSWD, self::$BDNAME);
+        $conexion = new mysqli(self::$DIRECCION, self::$USER, self::$PSWD, self::$BDNAME);
         $query = "UPDATE usuario SET partidasGanadas = partidasGanadas + 1 WHERE id= ? ;";
-        $stmt = mysqli_prepare($conexion, $query);
-        mysqli_stmt_bind_param($stmt, "i", $u);
-        mysqli_stmt_execute($stmt);
-        mysqli_close($conexion);
+        $stmt = $conexion->prepare($query);
+        $stmt->bind_param("i", $u);
+        $stmt->execute();
+
+        $conexion->close();
     }
     public static function actualizarRankingJugadas($u)
     {
 
-        $conexion = mysqli_connect(self::$DIRECCION, self::$USER, self::$PSWD, self::$BDNAME);
+        $conexion = new mysqli(self::$DIRECCION, self::$USER, self::$PSWD, self::$BDNAME);
         $query = "UPDATE usuario SET partidasJugadas = partidasJugadas +1 WHERE id= ? ;";
-        $stmt = mysqli_prepare($conexion, $query);
-        mysqli_stmt_bind_param($stmt, "i", $u);
-        mysqli_stmt_execute($stmt);
-        mysqli_close($conexion);
+        $stmt = $conexion->prepare($query);
+        $stmt->bind_param("i", $u);
+        $stmt->execute();
+
+        $conexion->close();
     }
     public static function devolverRanking()
     {
         $v = [];
-        $conexion = mysqli_connect(self::$DIRECCION, self::$USER, self::$PSWD, self::$BDNAME);
+        $conexion = new mysqli(self::$DIRECCION, self::$USER, self::$PSWD, self::$BDNAME);
         $query = "SELECT nombre, partidasGanadas, partidasJugadas FROM usuario ORDER BY partidasGanadas DESC;";
-        $stmt = mysqli_prepare($conexion, $query);
-        mysqli_stmt_execute($stmt);
-        $resultados = mysqli_stmt_get_result($stmt);
+        $stmt = $conexion->prepare($query);
+        $stmt->execute();
+        $resultados = $stmt->get_result();
 
-        while ($fila = mysqli_fetch_array($resultados)) {
+        while ($fila = $resultados->fetch_array()) {
             $v[] = ['usuario' => $fila[0], 'ganadas' => $fila[1], 'jugadas' => $fila[2]];
         }
 
 
-        mysqli_close($conexion);
+        $conexion->close();
         return $v;
     }
     public static function rendirse($p)
     {
-
         $id = $p->id;
-        $conexion = mysqli_connect(self::$DIRECCION, self::$USER, self::$PSWD, self::$BDNAME);
+        $conexion = new mysqli(self::$DIRECCION, self::$USER, self::$PSWD, self::$BDNAME);
         $query = "UPDATE partida SET finalizada =  -1 WHERE id= ? ;";
-        $stmt = mysqli_prepare($conexion, $query);
-        mysqli_stmt_bind_param($stmt, "i", $id);
-        mysqli_stmt_execute($stmt);
-        mysqli_close($conexion);
+        $stmt = $conexion->prepare($query);
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $conexion->close();
     }
 
     public static function insertarUsuario($u)
     {
 
         $m = '';
-        $conexion = mysqli_connect(self::$DIRECCION, self::$USER, self::$PSWD, self::$BDNAME);
+        $conexion = new mysqli(self::$DIRECCION, self::$USER, self::$PSWD, self::$BDNAME);
         $query = "INSERT INTO usuario (password, nombre, admin) VALUES (?,?,?)";
 
-        $stmt = mysqli_prepare($conexion, $query);
+        $stmt = $conexion->prepare($query);
 
-        mysqli_stmt_bind_param($stmt, "ssi", $u->password, $u->nombre, $u->admin);
+        $stmt->bind_param("ssi", $u->password, $u->nombre, $u->admin);
 
         try {
-            $m = mysqli_stmt_execute($stmt);
+            $m = $stmt->execute();
             $m = ['registrado' => true];
         } catch (Exception $e) {
             $m = ['registrado' => false, 'excepcion' => $e->getMessage()];
         }
 
-        mysqli_close($conexion);
+        $conexion->close();
         return $m;
     }
     static function consultarUsuarioPorNombre($user)
     {
-        $conexion = mysqli_connect(self::$DIRECCION, self::$USER, self::$PSWD, self::$BDNAME);
+        $conexion = new mysqli(self::$DIRECCION, self::$USER, self::$PSWD, self::$BDNAME);
         $consulta = "SELECT * FROM usuario WHERE nombre= ? ";
-        $stmt = mysqli_prepare($conexion, $consulta);
-        mysqli_stmt_bind_param($stmt, "i", $user);
-        mysqli_stmt_execute($stmt);
-        $resultados = mysqli_stmt_get_result($stmt);
+        $stmt = $conexion->prepare($consulta);
+        $stmt->bind_param("i", $user);
+        $stmt->execute();
+        $resultados = $stmt->get_result();
 
         $v = [];
         try {
-            $fila = mysqli_fetch_array($resultados);
-            $u =  new Usuario($fila[0], $fila[1], $fila[2],$fila[5], $fila[3], $fila[4]);
+            $fila = $resultados->fetch_array();
+            $u =  new Usuario($fila[0], $fila[1], $fila[2], $fila[5], $fila[3], $fila[4]);
             $v = ['usuario' => $u];
         } catch (Exception $e) {
             $v['excepcion'] = $e->getMessage();
         }
-        mysqli_close($conexion);
+        $resultados->free_result();
+        $conexion->close();
         return $v;
     }
     static function consultarTodosUsuario()
     {
-        $conexion = mysqli_connect(self::$DIRECCION, self::$USER, self::$PSWD, self::$BDNAME);
+        $conexion = new mysqli(self::$DIRECCION, self::$USER, self::$PSWD, self::$BDNAME);
         $consulta = "SELECT * FROM usuario";
-        $stmt = mysqli_prepare($conexion, $consulta);
+        $stmt = $conexion->prepare($consulta);
 
-        mysqli_stmt_execute($stmt);
-        $resultados = mysqli_stmt_get_result($stmt);
+        $stmt->execute();
+        $resultados = $stmt->get_result();
         $v = [];
         try {
-            while ($fila = mysqli_fetch_array($resultados)) {
+            while ($fila = $resultados->fetch_array()) {
 
-                $u = new Usuario($fila[0], $fila[1], $fila[2],$fila[5], $fila[3], $fila[4]);
+                $u = new Usuario($fila[0], $fila[1], $fila[2], $fila[5], $fila[3], $fila[4]);
                 $usuarios[] = $u;
             }
             $v = ['usuarios' => $usuarios];
         } catch (Exception $e) {
             $v = ['excepcion' => $e->getMessage()];
         }
-        mysqli_close($conexion);
+        $resultados->free_result();
+        $conexion->close();
         return $v;
     }
     public static function updatePassword($user, $password)
     {
-        $v=[];
-        $conexion = mysqli_connect(self::$DIRECCION, self::$USER, self::$PSWD, self::$BDNAME);
+        $v = [];
+        $conexion = new mysqli(self::$DIRECCION, self::$USER, self::$PSWD, self::$BDNAME);
         $query = "UPDATE usuario SET password =  ? WHERE nombre = ? ;";
-        $stmt = mysqli_prepare($conexion, $query);
-        mysqli_stmt_bind_param($stmt, "ss", $password, $user);
-        try{
-            mysqli_stmt_execute($stmt);
-            $v=['update'=>true];
-        }catch(Exception $e){
-            $v=['update'=>false,'excepcion'=>$e->getMessage()];
-        }
+        $stmt = $conexion->prepare($query);
+        $stmt->bind_param("ss", $password, $user);
+        $stmt->execute();
 
-        mysqli_close($conexion);
+        try {
+            $stmt->execute();
+            $v = ['update' => true];
+        } catch (Exception $e) {
+            $v = ['update' => false, 'excepcion' => $e->getMessage()];
+        }
+        $conexion->close();
+
         return $v;
     }
-    public static function deleteUsuario($user){
-        $v=[];
-        $conexion = mysqli_connect(self::$DIRECCION, self::$USER, self::$PSWD, self::$BDNAME);
+    public static function deleteUsuario($user)
+    {
+        $v = [];
+        $conexion = new mysqli(self::$DIRECCION, self::$USER, self::$PSWD, self::$BDNAME);
         $query = "DELETE FROM usuario  WHERE nombre = ? ;";
-        $stmt = mysqli_prepare($conexion, $query);
-        mysqli_stmt_bind_param($stmt, "s", $user);
-        try{
-            mysqli_stmt_execute($stmt);
-            $v=['delete'=>true];
-        }catch(Exception $e){
-            $v=['delete'=>false,'excepcion'=>$e->getMessage()];
+        $stmt = $conexion->prepare($query);
+        $stmt->bind_param("s", $user);
+        try {
+            $stmt->execute();
+            $v = ['delete' => true];
+        } catch (Exception $e) {
+            $v = ['delete' => false, 'excepcion' => $e->getMessage()];
         }
-
-        mysqli_close($conexion);
+        $conexion->close();
         return $v;
-
     }
-   
 }

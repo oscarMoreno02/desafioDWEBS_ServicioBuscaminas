@@ -144,17 +144,17 @@ if ($requestMethod == 'POST') {
 
 if ($requestMethod == 'PUT') {
     if ($argus[1] == 'recuperacion') {
-        $email=$datos->email;
-        $u=$datos->usuario;
-        $accion=ControladorMina::recuperarCuenta($email,$u);
-    } else{
+        $email = $datos->email;
+        $u = $datos->usuario;
+        $accion = ControladorMina::recuperarCuenta($email, $u);
+    } else {
         $accion = ControladorMina::Login($datos->usuario, $datos->password);
 
-    if ($accion['codigo'] == 400) {
-        $cod = $accion['codigo'];
-        $mensaje = $accion['mensaje'];
-    } else {
-        $user = $accion['usuario'];
+        if ($accion['codigo'] == 400) {
+            $cod = $accion['codigo'];
+            $mensaje = $accion['mensaje'];
+        } else {
+            $user = $accion['usuario'];
             $accion = ControladorMina::validarAdmin($user);
             if ($accion['admin']) {
                 $u = $datos->usuarioUpdate;
@@ -162,12 +162,11 @@ if ($requestMethod == 'PUT') {
 
                 $accion = ControladorMina::cambiarPassword($u, $p);
             }
-    }
-
         }
-        $cod = $accion['codigo'];
-        $mensaje = $accion['mensaje'];
-        header("HTTP/1.1 " . $cod . ' ' . $mensaje);
+    }
+    $cod = $accion['codigo'];
+    $mensaje = $accion['mensaje'];
+    header("HTTP/1.1 " . $cod . ' ' . $mensaje);
 }
 
 if ($requestMethod == 'DELETE') {
@@ -190,5 +189,3 @@ if ($requestMethod == 'DELETE') {
         header("HTTP/1.1 " . $cod . ' ' . $mensaje);
     }
 }
-
-
