@@ -27,73 +27,81 @@ $datos = json_decode($json);
 $accion;
 
 if ($requestMethod == 'GET') {
-    $u=$datos->usuario;
-    $p=$datos->password;
-    $accion = ControladorMina::Login($u,$p);
-
-    if ($accion['codigo'] == 400) {
-
+    $u = $datos->usuario;
+    $p = $datos->password;
+    $accion = ControladorMina::Login($u, $p);
+    if ($argus[1] == 'ranking' && $accion['codigo']==200) {
+        $accion = ControladorMina::mostrarRanking();
         $cod = $accion['codigo'];
         $mensaje = $accion['mensaje'];
         header("HTTP/1.1 " . $cod . ' ' . $mensaje);
+        echo json_encode(['ranking' => $accion['ranking']]);
     } else {
-        $user = $accion['usuario'];
-        if ($argus[1] == 'consultar') {
+        
+        if ($accion['codigo'] == 400) {
 
-            $accion = ControladorMina::validarAdmin($user);
-
-            if ($accion['admin']) {
-                if (count($argus) > 1) {
-                    $accion = ControladorMina::listarUnUsuario($argus[2]);
-                    if ($accion['excepcion']) {
-                        $cod = $accion['codigo'];
-                        $mensaje = $accion['mensaje'];
-                        header("HTTP/1.1 " . $cod . ' ' . $mensaje);
-                        echo json_encode(['excepcion' => $accion['excepcion']]);
-                    } else {
-                        $cod = $accion['codigo'];
-                        $mensaje = $accion['mensaje'];
-                        header("HTTP/1.1 " . $cod . ' ' . $mensaje);
-                        echo json_encode(['excepcion' => $accion['usuario']]);
-                    }
-                } else {
-                    $accion = ControladorMina::listarTodosUsuarios();
-                    if ($accion['excepcion']) {
-                        $cod = $accion['codigo'];
-                        $mensaje = $accion['mensaje'];
-                        header("HTTP/1.1 " . $cod . ' ' . $mensaje);
-                        echo json_encode(['excepcion' => $accion['excepcion']]);
-                    } else {
-                        $cod = $accion['codigo'];
-                        $mensaje = $accion['mensaje'];
-                        header("HTTP/1.1 " . $cod . ' ' . $mensaje);
-                        echo json_encode(['excepcion' => $accion['usuarios']]);
-                    }
-                }
-            }
+            $cod = $accion['codigo'];
+            $mensaje = $accion['mensaje'];
+            header("HTTP/1.1 " . $cod . ' ' . $mensaje);
         } else {
-            $accion = ControladorMina::partidaPendienteExiste($accion['usuario']);
-            if ($accion['codigo'] == 200) {
-                if (count($argus) == 1) {
+            $user = $accion['usuario'];
+            if ($argus[1] == 'consultar') {
 
-                    $accion = ControladorMina::nuevaPartida(Constantes::$TABLERODEFAULT, Constantes::$MINASDEFAULT, $accion['usuario']);
-                    $cod = $accion['codigo'];
-                    $mensaje = $accion['mensaje'];
-                    header("HTTP/1.1 " . $cod . ' ' . $mensaje);
-                    echo json_encode(['tablero' => $accion['partida']->oculto]);
-                } else {
-                    $accion = ControladorMina::nuevaPartida((int)$argus[1], (int)$argus[2], $accion['usuario']);
-                    $cod = $accion['codigo'];
-                    $mensaje = $accion['mensaje'];
-                    header("HTTP/1.1 " . $cod . ' ' . $mensaje);
-                    echo json_encode(['tablero' => $accion['partida']->oculto]);
+                $accion = ControladorMina::validarAdmin($user);
+
+                if ($accion['admin']) {
+                    if (count($argus) > 1) {
+                        $accion = ControladorMina::listarUnUsuario($argus[2]);
+                        if ($accion['excepcion']) {
+                            $cod = $accion['codigo'];
+                            $mensaje = $accion['mensaje'];
+                            header("HTTP/1.1 " . $cod . ' ' . $mensaje);
+                            echo json_encode(['excepcion' => $accion['excepcion']]);
+                        } else {
+                            $cod = $accion['codigo'];
+                            $mensaje = $accion['mensaje'];
+                            header("HTTP/1.1 " . $cod . ' ' . $mensaje);
+                            echo json_encode(['excepcion' => $accion['usuario']]);
+                        }
+                    } else {
+                        $accion = ControladorMina::listarTodosUsuarios();
+                        if ($accion['excepcion']) {
+                            $cod = $accion['codigo'];
+                            $mensaje = $accion['mensaje'];
+                            header("HTTP/1.1 " . $cod . ' ' . $mensaje);
+                            echo json_encode(['excepcion' => $accion['excepcion']]);
+                        } else {
+                            $cod = $accion['codigo'];
+                            $mensaje = $accion['mensaje'];
+                            header("HTTP/1.1 " . $cod . ' ' . $mensaje);
+                            echo json_encode(['excepcion' => $accion['usuarios']]);
+                        }
+                    }
                 }
             } else {
-                $p = ControladorMina::obtenerPartida($accion['usuario']);
-                $cod = $accion['codigo'];
-                $mensaje = $accion['mensaje'];
-                header("HTTP/1.1 " . $cod . ' ' . $mensaje);
-                echo json_encode(['tablero' => $p->oculto]);
+                $accion = ControladorMina::partidaPendienteExiste($accion['usuario']);
+                if ($accion['codigo'] == 200) {
+                    if (count($argus) == 1) {
+
+                        $accion = ControladorMina::nuevaPartida(Constantes::$TABLERODEFAULT, Constantes::$MINASDEFAULT, $accion['usuario']);
+                        $cod = $accion['codigo'];
+                        $mensaje = $accion['mensaje'];
+                        header("HTTP/1.1 " . $cod . ' ' . $mensaje);
+                        echo json_encode(['tablero' => $accion['partida']->oculto]);
+                    } else {
+                        $accion = ControladorMina::nuevaPartida((int)$argus[1], (int)$argus[2], $accion['usuario']);
+                        $cod = $accion['codigo'];
+                        $mensaje = $accion['mensaje'];
+                        header("HTTP/1.1 " . $cod . ' ' . $mensaje);
+                        echo json_encode(['tablero' => $accion['partida']->oculto]);
+                    }
+                } else {
+                    $p = ControladorMina::obtenerPartida($accion['usuario']);
+                    $cod = $accion['codigo'];
+                    $mensaje = $accion['mensaje'];
+                    header("HTTP/1.1 " . $cod . ' ' . $mensaje);
+                    echo json_encode(['tablero' => $p->oculto]);
+                }
             }
         }
     }
@@ -128,7 +136,7 @@ if ($requestMethod == 'POST') {
             if ($accion['codigo'] == 201) {
 
                 $p = ControladorMina::obtenerPartida($accion['usuario']);
-                if ($argus[1]== 'rendicion') {
+                if ($argus[1] == 'rendicion') {
                     $accion = ControladorMina::rendicion($user, $p);
                 } else {
                     $accion = ControladorMina::juegaRonda($p, $datos->casilla, $user);
@@ -138,10 +146,6 @@ if ($requestMethod == 'POST') {
             }
         }
     }
-
-
-
-
 }
 
 if ($requestMethod == 'PUT') {
@@ -151,11 +155,10 @@ if ($requestMethod == 'PUT') {
         $accion = ControladorMina::recuperarCuenta($email, $u);
     } else {
         $accion = ControladorMina::Login($datos->usuario, $datos->password);
-        
+
         if ($accion['codigo'] == 400) {
             $cod = $accion['codigo'];
             $mensaje = $accion['mensaje'];
-           
         } else {
             $user = $accion['usuario'];
             $accion = ControladorMina::validarAdmin($user);

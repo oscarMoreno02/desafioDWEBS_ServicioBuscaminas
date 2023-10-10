@@ -4,7 +4,19 @@
 
 
 <------------------------>
-Ruta: http:://127.0.0.1:9090/
+Ruta: http:://127.0.0.1:9090/ranking
+JSon:
+{
+    "usuario": "xxxx",
+    "password": "xxxx"
+}
+
+Resolucion: Devolvera el ranking con nombre de usuario, victorias y partidas jugadas ordenadas por las victorias si el usuario es correcto.
+<------------------------>
+
+
+<------------------------>
+Ruta: http:://127.0.0.1:9090
 JSon:
 {
     "usuario": "xxxx",

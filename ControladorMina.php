@@ -86,7 +86,14 @@ class ControladorMina
   }
   public static function mostrarRanking()
   {
-    $v = Conexion::devolverRanking();
+
+    $r = Conexion::devolverRanking();
+    if($r!=null){
+      $v=['codigo'=>200,'mensaje'=>'Ranking procesado','ranking'=>$r];
+    } else{
+      $v=['codigo'=>400,'mensaje'=>'Error al procesar el ranking'];
+    }
+    
     return $v;
   }
 
