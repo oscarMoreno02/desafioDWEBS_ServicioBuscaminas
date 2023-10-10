@@ -5,15 +5,11 @@
 
 class Conexion
 {
-    public $conexion;
-    static $DIRECCION = 'localhost';
-    static $USER = 'oscar';
-    static $PSWD = '123';
-    static $BDNAME = 'minas';
+
 
     public static function consultarUsuarioAdministrador($id)
     {
-        $conexion = new mysqli(self::$DIRECCION, self::$USER, self::$PSWD, self::$BDNAME);
+        $conexion = new mysqli(Constantes::$DIRECCION, Constantes::$USER, Constantes::$PSWD, Constantes::$BDNAME);
         $admin = true;
         $consulta = "SELECT admin FROM usuario WHERE id = ? ";
         $stmt = $conexion->prepare($consulta);
@@ -32,7 +28,7 @@ class Conexion
 
     public static function consultarUsuarioExiste($user, $password)
     {
-        $conexion = new mysqli(self::$DIRECCION, self::$USER, self::$PSWD, self::$BDNAME);
+        $conexion = new mysqli(Constantes::$DIRECCION, Constantes::$USER, Constantes::$PSWD, Constantes::$BDNAME);
 
         $consulta =
             "SELECT COUNT(*), id FROM usuario WHERE nombre = ? AND password = ? GROUP BY id";
@@ -53,7 +49,7 @@ class Conexion
     }
     public static function consultarPartida($user)
     {
-        $conexion = new mysqli(self::$DIRECCION, self::$USER, self::$PSWD, self::$BDNAME);
+        $conexion = new mysqli(Constantes::$DIRECCION, Constantes::$USER, Constantes::$PSWD, Constantes::$BDNAME);
         $consulta = "SELECT * FROM partida WHERE idUsuario = ? and finalizada = 0";
         $stmt = $conexion->prepare($consulta);
         $stmt->bind_param("i", $id);
@@ -74,7 +70,8 @@ class Conexion
     public static function insertar($p)
     {
         $m = '';
-        $conexion = new mysqli(self::$DIRECCION, self::$USER, self::$PSWD, self::$BDNAME);
+        $conexion = new mysqli(Constantes::$DIRECCION, Constantes::$USER, Constantes::$PSWD, Constantes::$BDNAME);
+
         $query = "INSERT INTO partida (idUsuario,tablero,oculto,finalizada) VALUES (?,?,?,?)";
 
         $stmt = $conexion->prepare($query);
@@ -95,7 +92,7 @@ class Conexion
     public static function actualizarFinalizada($p)
     {
 
-        $conexion = new mysqli(self::$DIRECCION, self::$USER, self::$PSWD, self::$BDNAME);
+      $conexion = new mysqli(Constantes::$DIRECCION, Constantes::$USER, Constantes::$PSWD, Constantes::$BDNAME);
         $t = $p->terminado;
         $query = "UPDATE partida SET finalizada = ? WHERE id = ?;";
         $stmt = $conexion->prepare($query);
@@ -112,7 +109,7 @@ class Conexion
     public static function actualizarTableros($p)
     {
 
-        $conexion = new mysqli(self::$DIRECCION, self::$USER, self::$PSWD, self::$BDNAME);
+        $conexion = new mysqli(Constantes::$DIRECCION, Constantes::$USER, Constantes::$PSWD, Constantes::$BDNAME);
         $query = "UPDATE partida SET oculto = ?, tablero = ? WHERE id= ?;";
         $stmt = $conexion->prepare($query);
         $stmt->bind_param("ssi", $p->oculto, $p->tablero, $p->id);
@@ -125,7 +122,7 @@ class Conexion
 
     public static function consultarTerminadas($user)
     {
-        $conexion = new mysqli(self::$DIRECCION, self::$USER, self::$PSWD, self::$BDNAME);
+        $conexion = new mysqli(Constantes::$DIRECCION, Constantes::$USER, Constantes::$PSWD, Constantes::$BDNAME);
         $v = [];
         $query = "SELECT COUNT(*) FROM partida WHERE finalizada = 0 and idUsuario= '" . $user . "'";
         $stmt = mysqli_prepare($conexion, $query);
@@ -148,7 +145,7 @@ class Conexion
     public static function actualizarRankingGanadas($u)
     {
 
-        $conexion = new mysqli(self::$DIRECCION, self::$USER, self::$PSWD, self::$BDNAME);
+        $conexion = new mysqli(Constantes::$DIRECCION, Constantes::$USER, Constantes::$PSWD, Constantes::$BDNAME);
         $query = "UPDATE usuario SET partidasGanadas = partidasGanadas + 1 WHERE id= ? ;";
         $stmt = $conexion->prepare($query);
         $stmt->bind_param("i", $u);
@@ -159,7 +156,7 @@ class Conexion
     public static function actualizarRankingJugadas($u)
     {
 
-        $conexion = new mysqli(self::$DIRECCION, self::$USER, self::$PSWD, self::$BDNAME);
+        $conexion = new mysqli(Constantes::$DIRECCION, Constantes::$USER, Constantes::$PSWD, Constantes::$BDNAME);
         $query = "UPDATE usuario SET partidasJugadas = partidasJugadas +1 WHERE id= ? ;";
         $stmt = $conexion->prepare($query);
         $stmt->bind_param("i", $u);
@@ -170,7 +167,7 @@ class Conexion
     public static function devolverRanking()
     {
         $v = [];
-        $conexion = new mysqli(self::$DIRECCION, self::$USER, self::$PSWD, self::$BDNAME);
+        $conexion = new mysqli(Constantes::$DIRECCION, Constantes::$USER, Constantes::$PSWD, Constantes::$BDNAME);
         $query = "SELECT nombre, partidasGanadas, partidasJugadas FROM usuario ORDER BY partidasGanadas DESC;";
         $stmt = $conexion->prepare($query);
         $stmt->execute();
@@ -187,7 +184,7 @@ class Conexion
     public static function rendirse($p)
     {
         $id = $p->id;
-        $conexion = new mysqli(self::$DIRECCION, self::$USER, self::$PSWD, self::$BDNAME);
+        $conexion = new mysqli(Constantes::$DIRECCION, Constantes::$USER, Constantes::$PSWD, Constantes::$BDNAME);
         $query = "UPDATE partida SET finalizada =  -1 WHERE id= ? ;";
         $stmt = $conexion->prepare($query);
         $stmt->bind_param("i", $id);
@@ -199,7 +196,7 @@ class Conexion
     {
 
         $m = '';
-        $conexion = new mysqli(self::$DIRECCION, self::$USER, self::$PSWD, self::$BDNAME);
+        $conexion = new mysqli(Constantes::$DIRECCION, Constantes::$USER, Constantes::$PSWD, Constantes::$BDNAME);
         $query = "INSERT INTO usuario (password, nombre, admin) VALUES (?,?,?)";
 
         $stmt = $conexion->prepare($query);
@@ -218,7 +215,7 @@ class Conexion
     }
     static function consultarUsuarioPorNombre($user)
     {
-        $conexion = new mysqli(self::$DIRECCION, self::$USER, self::$PSWD, self::$BDNAME);
+        $conexion = new mysqli(Constantes::$DIRECCION, Constantes::$USER, Constantes::$PSWD, Constantes::$BDNAME);
         $consulta = "SELECT * FROM usuario WHERE nombre= ? ";
         $stmt = $conexion->prepare($consulta);
         $stmt->bind_param("i", $user);
@@ -239,7 +236,7 @@ class Conexion
     }
     static function consultarTodosUsuario()
     {
-        $conexion = new mysqli(self::$DIRECCION, self::$USER, self::$PSWD, self::$BDNAME);
+        $conexion = new mysqli(Constantes::$DIRECCION, Constantes::$USER, Constantes::$PSWD, Constantes::$BDNAME);
         $consulta = "SELECT * FROM usuario";
         $stmt = $conexion->prepare($consulta);
 
@@ -263,7 +260,7 @@ class Conexion
     public static function updatePassword($user, $password)
     {
         $v = [];
-        $conexion = new mysqli(self::$DIRECCION, self::$USER, self::$PSWD, self::$BDNAME);
+        $conexion = new mysqli(Constantes::$DIRECCION, Constantes::$USER, Constantes::$PSWD, Constantes::$BDNAME);
         $query = "UPDATE usuario SET password =  ? WHERE nombre = ? ;";
         $stmt = $conexion->prepare($query);
         $stmt->bind_param("ss", $password, $user);
@@ -282,7 +279,7 @@ class Conexion
     public static function deleteUsuario($user)
     {
         $v = [];
-        $conexion = new mysqli(self::$DIRECCION, self::$USER, self::$PSWD, self::$BDNAME);
+        $conexion = new mysqli(Constantes::$DIRECCION, Constantes::$USER, Constantes::$PSWD, Constantes::$BDNAME);
         $query = "DELETE FROM usuario  WHERE nombre = ? ;";
         $stmt = $conexion->prepare($query);
         $stmt->bind_param("s", $user);

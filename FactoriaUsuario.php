@@ -17,7 +17,7 @@ class FactoriaUsuario
      public static function generarPasswordAleatoriamente()
      {
           $letras = ['a', 'e', 'i', 'o', 'u'];
-          $longitud = rand(7, 10);
+          $longitud = rand(Constantes::$MINPASSWORD, Constantes::$MAXPASSWORD);
           $password = [];
           for ($i = 0; $i <= $longitud; $i++) {
                $n = rand(0, 100);

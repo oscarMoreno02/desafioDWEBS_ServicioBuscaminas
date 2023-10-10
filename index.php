@@ -73,7 +73,7 @@ if ($requestMethod == 'GET') {
             if ($accion['codigo'] == 200) {
                 if (count($argus) == 1) {
 
-                    $accion = ControladorMina::nuevaPartida(10, 2, $accion['usuario']);
+                    $accion = ControladorMina::nuevaPartida(Constantes::$TABLERODEFAULT, Constantes::$MINASDEFAULT, $accion['usuario']);
                     $cod = $accion['codigo'];
                     $mensaje = $accion['mensaje'];
                     header("HTTP/1.1 " . $cod . ' ' . $mensaje);

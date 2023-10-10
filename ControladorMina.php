@@ -176,15 +176,13 @@ class ControladorMina
     if ($v['codigo'] == 200) {
       try {
         $mail = new PHPMailer();
-
-
         $mail->isSMTP();
-        $mail->Host       = 'smtp.gmail.com';
-        $mail->SMTPAuth   = true;
-        $mail->Username   = 'auxiliardaw2@gmail.com';
-        $mail->Password   = 'gaxrwhgytqclfiyd';
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
-        $mail->Port       = 465;
+        $mail->Host       = Constantes::$MAILHOST;
+        $mail->SMTPAuth   = Constantes::$MAILAUTH;
+        $mail->Username   = Constantes::$MAILUSERNAME;
+        $mail->Password   = Constantes::$MAILPASSWORD;
+        $mail->SMTPSecure = Constantes::$MAILSECURE;
+        $mail->Port       = Constantes::$MAILPORT;
 
         $mail->setFrom('auxiliardaw2@gmail.com', 'Fernando Aranzabe');
 

@@ -7,8 +7,8 @@ class FactoriaPartida
           $restantes = 0;
           while ($restantes < $minas) {
                $posicionAleatoria = rand(0, $tamaño - 1);
-               if ($tablero[$posicionAleatoria] != 9) {
-                    $tablero[$posicionAleatoria] = 9;
+               if ($tablero[$posicionAleatoria] != Constantes::$MINA) {
+                    $tablero[$posicionAleatoria] = Constantes::$MINA;
                     $restantes++;
                }
           }
