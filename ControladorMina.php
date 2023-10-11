@@ -193,7 +193,7 @@ class ControladorMina
         $mail->SMTPSecure = Constantes::$MAILSECURE;
         $mail->Port       = Constantes::$MAILPORT;
 
-        $mail->setFrom('auxiliardaw2@gmail.com', 'Fernando Aranzabe');
+        $mail->setFrom(Constantes::$MAILFROMMAIL, Constantes::$MAILFROMNAME);
 
         $mail->addAddress($email, $user);
 
