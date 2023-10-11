@@ -44,9 +44,9 @@ class ControladorMina
 
     if ($n['contador'] == 1) {
 
-      return ['codigo' => 201, 'mensaje' => 'Ya existe una partida creada', 'usuario' => $user];
+      return ['codigo' => 200, 'mensaje' => 'Ya existe una partida creada', 'usuario' => $user];
     } else {
-      return ['codigo' => 200, 'usuario' => $user];
+      return ['codigo' => 400, 'mensaje'=>'No existe ninguna partida en curso','usuario' => $user];
     }
   }
 

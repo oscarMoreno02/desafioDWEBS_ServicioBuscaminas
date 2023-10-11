@@ -14,7 +14,6 @@ require_once 'phpmailer/src/Exception.php';
 require_once 'phpmailer/src/PHPMailer.php';
 require_once 'phpmailer/src/SMTP.php';
 
-// print_r(ControladorMina::mostrarRanking());
 header("Content-Type:application/json");
 $requestMethod = $_SERVER["REQUEST_METHOD"];
 $paths = $_SERVER['REQUEST_URI'];
@@ -80,7 +79,7 @@ if ($requestMethod == 'GET') {
                 }
             } else {
                 $accion = ControladorMina::partidaPendienteExiste($accion['usuario']);
-                if ($accion['codigo'] == 200) {
+                if ($accion['codigo'] == 400) {
                     if (count($argus) == 1) {
 
                         $accion = ControladorMina::nuevaPartida(Constantes::$TABLERODEFAULT, Constantes::$MINASDEFAULT, $accion['usuario']);
@@ -131,21 +130,28 @@ if ($requestMethod == 'POST') {
                 }
             }
         } else {
-            $accion = ControladorMina::partidaPendienteExiste($accion['usuario']);
+            $accion = ControladorMina::partidaPendienteExiste($user);
+    
+            if ($accion['codigo'] == 200) {
 
-            if ($accion['codigo'] == 201) {
-
-                $p = ControladorMina::obtenerPartida($accion['usuario']);
+                $p = ControladorMina::obtenerPartida($user);
+                
                 if ($argus[1] == 'rendicion') {
                     $accion = ControladorMina::rendicion($user, $p);
+                     echo json_encode(['partida' => $accion['partida']]);
+                
                 } else {
                     $accion = ControladorMina::juegaRonda($p, $datos->casilla, $user);
+                    echo json_encode(['partida' => $accion['partida']]);
                 }
             } else {
-                $accion = ['codigo' => 404, 'mensaje' => 'No se ha encontrado ningun partida'];
+                $accion = ['codigo' => 201, 'mensaje' => 'No se ha encontrado ningun partida'];
             }
         }
     }
+                 $cod = $accion['codigo'];
+                $mensaje = $accion['mensaje'];
+                header("HTTP/1.1 " . $cod . ' ' . $mensaje);
 }
 
 if ($requestMethod == 'PUT') {

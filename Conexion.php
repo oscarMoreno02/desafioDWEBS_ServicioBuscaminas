@@ -123,8 +123,9 @@ class Conexion
     {
         $conexion = new mysqli(Constantes::$DIRECCION, Constantes::$USER, Constantes::$PSWD, Constantes::$BDNAME);
         $v = [];
-        $query = "SELECT COUNT(*) FROM partida WHERE finalizada = 0 and idUsuario= '" . $user . "'";
+        $query = "SELECT COUNT(*) FROM partida WHERE finalizada = 0 and idUsuario= ?";
         $stmt = $conexion->prepare($query);
+        $stmt->bind_param('i',$user);
         $stmt->execute();
         $resultados = $stmt->get_result();
         $fila = $resultados->fetch_array();
