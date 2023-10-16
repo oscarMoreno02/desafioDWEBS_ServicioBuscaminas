@@ -1,12 +1,13 @@
 <?php
 require_once './Conexion.php';
-require_once './Partida.php';
-require_once './FactoriaPartida.php';
-require_once './ControladorMina.php';
-require_once './FactoriaUsuario.php';
-require_once './Usuario.php';
+require_once './Clases/Partida.php';
+require_once './Clases/Partida.php';
+require_once './Controladores/ControladorMina.php';
+require_once './Factorias/FactoriaUsuario.php';
+require_once './Clases/Usuario.php';
 require_once './Constantes.php';
-
+require_once './Controladores/ControladorAdmin.php';
+require_once './Controladores/ControladorUsuario.php';
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 
@@ -28,9 +29,9 @@ $accion;
 if ($requestMethod == 'GET') {
     $u = $datos->usuario;
     $p = $datos->password;
-    $accion = ControladorMina::Login($u, $p);
+    $accion = ControladorUsuario::Login($u, $p);
     if ($argus[1] == 'ranking' && $accion['codigo']==200) {
-        $accion = ControladorMina::mostrarRanking();
+        $accion = ControladorUsuario::mostrarRanking();
 
     } else {
         if ($accion['codigo'] != 200) {
@@ -39,13 +40,13 @@ if ($requestMethod == 'GET') {
             $user = $accion['usuario'];
             if ($argus[1] == 'consultar') {
 
-                $accion = ControladorMina::validarAdmin($user);
+                $accion = ControladorAdmin::validarAdmin($user);
 
                 if ($accion['admin']) {
                     if (count($argus) > 1) {
-                        $accion = ControladorMina::listarUnUsuario($argus[2]);
+                        $accion = ControladorAdmin::listarUnUsuario($argus[2]);
                     } else {
-                        $accion = ControladorMina::listarTodosUsuarios();
+                        $accion = ControladorAdmin::listarTodosUsuarios();
                     }
                 }
             } else {
@@ -68,7 +69,7 @@ if ($requestMethod == 'GET') {
     }
 }
 if ($requestMethod == 'POST') {
-    $accion = ControladorMina::Login($datos->usuario, $datos->password);
+    $accion = ControladorUsuario::Login($datos->usuario, $datos->password);
 
     if ($accion['codigo'] != 200) {
 
@@ -77,11 +78,11 @@ if ($requestMethod == 'POST') {
 
         if ($argus[1] == 'nuevo') {
 
-            $accion = ControladorMina::validarAdmin($user);
+            $accion = ControladorAdmin::validarAdmin($user);
 
             if ($accion['admin']) {
 
-                $accion = ControladorMina::registrarUsuario($datos->nuevoPassword, $datos->nuevoNombre, $datos->adm);
+                $accion = ControladorAdmin::registrarUsuario($datos->nuevoPassword, $datos->nuevoNombre, $datos->adm);
             }
         } else {
             $accion = ControladorMina::partidaPendienteExiste($user);
@@ -112,36 +113,35 @@ if ($requestMethod == 'PUT') {
     if ($argus[1] == 'recuperacion') {
         $email = $datos->email;
         $u = $datos->usuario;
-        $accion = ControladorMina::recuperarCuenta($email, $u);
+        $accion = ControladorUsuario::recuperarCuenta($email, $u);
     } else {
-        $accion = ControladorMina::Login($datos->usuario, $datos->password);
+        $accion = ControladorUsuario::Login($datos->usuario, $datos->password);
 
         if ($accion['codigo'] != 200) {
             
         } else {
             $user = $accion['usuario'];
-            $accion = ControladorMina::validarAdmin($user);
+            $accion = ControladorAdmin::validarAdmin($user);
             if ($accion['admin']) {
                 $u = $datos->usuarioUpdate;
                 $p = $datos->passwordUpdate;
-
-                $accion = ControladorMina::cambiarPassword($u, $p,0);
+                $accion = ControladorAdmin::cambiarPassword($u, $p,0);
             }
         }
     }
 }
 
 if ($requestMethod == 'DELETE') {
-    $accion = ControladorMina::Login($datos->usuario, $datos->password);
+    $accion = ControladorUsuario::Login($datos->usuario, $datos->password);
 
     if ($accion['codigo'] != 200) {
        
     } else {
         $user = $accion['usuario'];
-        $accion = ControladorMina::validarAdmin($user);
+        $accion = ControladorAdmin::validarAdmin($user);
         if ($accion['admin']) {
             $u = $datos->usuarioDelete;
-            $accion = ControladorMina::eliminarUsuario($u);
+            $accion = ControladorAdmin::eliminarUsuario($u);
         }
     }
 }
