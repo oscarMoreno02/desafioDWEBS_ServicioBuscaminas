@@ -83,6 +83,19 @@ Resolucion: Si el usuario y la contraseña son correctos, abrira una casilla del
 
 
 <------------------------>
+Ruta: http:://127.0.0.1:9090/rendicion
+JSon:
+{
+     "usuario": "xxxx",
+    "password": "xxxx"
+}
+
+Resolucion: Si el usuario y la contraseña son correctos, el usuario se rendira en esa partida
+<------------------------>
+
+
+
+<------------------------>
 Ruta: http:://127.0.0.1:9090/nuevo
 JSon:
 {

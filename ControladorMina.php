@@ -18,11 +18,11 @@ class ControladorMina
     $user = Conexion::consultarUsuarioExiste($usuario, $p);
 
     if ($user['n'] == 1) {
-      $v = ['usuario' => $user['n'], 'codigo' => 200];
+     return  $v = ['usuario' => $user['id'], 'codigo' => 200];
     } else {
-      $v = ['mensaje' => 'Error de usuario', 'codigo' => 400];
+            header("HTTP/1.1 400 error de usuario");
     }
-    return $v;
+    
   }
 
 
@@ -32,10 +32,13 @@ class ControladorMina
     $v = [];
     if (Conexion::insertar($partida) != null) {
       $v = ['codigo' => 200, 'partida' => $partida, 'mensaje' => 'Partida creada correctamente', 'usuario' => $user];
+      header("HTTP/1.1 200 Partida creada correctamente");
+      echo json_encode(['tablero' => $partida->oculto]);
     } else {
-      $v = ['codigo' => 400, 'mensaje' => 'Error al crear la partida'];
+      header("HTTP/1.1 400 Error al crear la partida");
+      
     }
-    return $v;
+   
   }
 
   public static function partidaPendienteExiste($user)
@@ -45,16 +48,21 @@ class ControladorMina
     if ($n['contador'] == 1) {
 
       return ['codigo' => 200, 'mensaje' => 'Ya existe una partida creada', 'usuario' => $user];
+    
     } else {
       return ['codigo' => 400, 'mensaje'=>'No existe ninguna partida en curso','usuario' => $user];
     }
   }
 
-  public static function obtenerPartida($user)
+  public static function mostrarPartida($p)
   {
-
+    
+    header("HTTP/1.1 200 Partida encontrada");
+    echo json_encode(['tablero' => $p->oculto]);
+    
+  }
+  public static function obtenerPartida($user){
     $p = Conexion::consultarPartida($user);
-
     return $p;
   }
   public static function juegaRonda($partida, $casilla, $user)
@@ -65,24 +73,26 @@ class ControladorMina
 
       Conexion::actualizarFinalizada($partida);
       Conexion::actualizarTableros($partida);
-      $v = ['mensaje' => 'Has perdido la partida', 'codigo' => 200, 'partida' => $partida->tablero];
       Conexion::actualizarRankingJugadas($user);
+        header("HTTP/1.1 200 Has perdido la partida");
+        echo json_encode(['partida' => $partida->tablero]);
     } else {
       if ($partida->comprobarGanada()) {
 
-        $v = ['mensaje' => 'Has ganado la partida ', 'codigo' => 200, 'partida' => $partida->tablero];
         Conexion::actualizarRankingJugadas($user);
         Conexion::actualizarRankingGanadas($user);
         Conexion::actualizarFinalizada($partida);
         Conexion::actualizarTableros($partida);
+        header("HTTP/1.1 200 Has ganado la partida");
+        echo json_encode(['partida' => $partida->tablero]);
       } else {
-        $v = ['mensaje' => 'Continua la partida', 'codigo' => 200, 'partida' => $partida->oculto];
-
         Conexion::actualizarTableros($partida);
+        header("HTTP/1.1 200 Continua la partida");
+        echo json_encode(['partida' => $partida->oculto]);
       }
     }
 
-    return $v;
+
   }
   public static function mostrarRanking()
   {
@@ -90,8 +100,10 @@ class ControladorMina
     $r = Conexion::devolverRanking();
     if($r!=null){
       $v=['codigo'=>200,'mensaje'=>'Ranking procesado','ranking'=>$r];
+      header('HTTP/1.1 200 Ranking procesado');
+      echo json_encode(['ranking'=>$r]);
     } else{
-      $v=['codigo'=>400,'mensaje'=>'Error al procesar el ranking'];
+      header("HTTP/1.1 400 Error al procesar el ranking");
     }
     
     return $v;
@@ -101,7 +113,8 @@ class ControladorMina
   {
     Conexion::rendirse($p);
     Conexion::actualizarRankingJugadas($user);
-    return ['mensaje' => 'Se ha rendido de la partida numero  ' . $p->id, 'codigo' => 200, 'partida' => $p->tablero];
+    header("HTTP/1.1 200 Se ha rendido de la partida");
+    echo json_encode(['partida' => $p->tablero]);
   }
 
   public static function validarAdmin($id)
@@ -109,11 +122,11 @@ class ControladorMina
     $v = [];
     if (Conexion::consultarUsuarioAdministrador($id)) {
 
-      $v = ['mensaje' => "ok", 'codigo' => 200, 'admin' => true];
+      return  ['mensaje' => "ok", 'codigo' => 200, 'admin' => true];
     } else {
-      $v = ['mensaje' => 'No tienes permisos', 'codigo' => 403, 'admin' => false];
+      header("HTTP/1.1 403 No tienes permisos");
     }
-    return $v;
+ 
   }
 
 
@@ -123,23 +136,24 @@ class ControladorMina
     $usuario = FactoriaUsuario::generarNuevoUsuario($p, $nombre, $admin);
     $registro = Conexion::insertarUsuario($usuario);
     if ($registro['registrado']) {
-      $v = ['mensaje' => 'Se ha registrado correctamente', 'codigo' => 201];
+    
+      header("HTTP/1.1 201 Se ha registrado correctamente");
     } else {
-      $v = ['mensaje' => 'No se pudo completar la inserccion', 'codigo' => 400, 'excepcion' => $registro['excepcion']];
+      header("HTTP/1.1 400 Error en la inserccion");
     }
-    return $v;
   }
 
   public static function listarUnUsuario($user)
   {
     $u = Conexion::consultarUsuarioPorNombre($user);
-    $v = [];
+  
     if ($u['excepcion']) {
-      $v = ['codigo' => 404, 'mensaje' => 'no encontrado', 'excepcion' => $u['excepcion']];
+      header("HTTP/1.1 404 No encontrado");
     } else {
-      $v = ['codigo' => 200, 'mensaje' => 'Encontrado', 'usuario' => $u['usuario']];
+      header("HTTP/1.1 200 Usuario encontrado");
+      echo json_encode(['usuario'=>$u['usuario']]);
     }
-    return $v;
+    
   }
 
   public static function listarTodosUsuarios()
@@ -147,41 +161,48 @@ class ControladorMina
     $u = Conexion::consultarTodosUsuario();
     $v = [];
     if ($u['excepcion']) {
-      $v = ['codigo' => 500, 'mensaje' => 'Error de servidor', 'excepcion' => $u['excepcion']];
+      header("HTTP/1.1 500 Error de servidor");
     } else {
-      $v = ['codigo' => 200, 'mensaje' => 'Encontrado correctamente', 'usuarios' => $u['usuarios']];
+      header("HTTP/1.1 200 Usuario encontrado");
+      echo json_encode(['usuarios'=>$u['usuarios']]);
     }
-    return $v;
+   
   }
 
-  public static function cambiarPassword($user, $password)
+  public static function cambiarPassword($user, $password,$n)
   {
     $v = [];
     $p = md5($password);
     $u = Conexion::updatePassword($user, $p);
+    if($n==0){
     if ($u['update']) {
-      $u = ['mensaje' => 'Modificado correctamente', 'codigo' => 200];
+       header("HTTP/1.1 200 Modificado correctamente");
     } else {
-
-      $u = ['codigo' => 412, 'mensaje' => 'Error en la modificacion', 'excepcion' => $u['excepcion']];
+      header("HTTP/1.1 412 Error en la modificacion");
     }
-    return $u;
+  }else{
+    return ['codigo'=>200];
   }
+  
+  }
+
   public static function eliminarUsuario($user)
   {
     $u = Conexion::deleteUsuario($user);
     $v = [];
     if ($u['delete' == true]) {
       $v = ['codigo' => 404, 'mensaje' => 'Error al eliminar', 'excepcion' => $u['excepcion']];
+        header("HTTP/1.1 404 Error al eliminar ");
     } else {
-      $v = ['codigo' => 200, 'mensaje' => 'Usuario Eliminado', 'usuario' => $u['usuario']];
+       header("HTTP/1.1 200 Usuario eliminado");
+  
     }
     return $v;
   }
   public static function recuperarCuenta($email, $user)
   {
     $newPassword = FactoriaUsuario::generarPasswordAleatoriamente();
-    $v = self::cambiarPassword($user, $newPassword);
+    $v = self::cambiarPassword($user, $newPassword,1);
     if ($v['codigo'] == 200) {
       try {
         $mail = new PHPMailer();
@@ -203,12 +224,16 @@ class ControladorMina
         $mail->AltBody = 'Usuario: ' . $user . ' su nueva contraseña es:' . $newPassword;
 
         $mail->send();
-        $v = ['mensaje' => 'El mensaje ha sido enviado', 'codigo' => 200];
+        header("HTTP/1.1 200 El mensaje ha sido enviado");
+    
       } catch (Exception $e) {
-        $v = ['mensaje' => 'No se pudo enviar el mensaje. Error de correo: {$mail->ErrorInfo}', 'codigo' => 404];
+       
+        header("HTTP/1.1 400 No se pudo enviar el mensaje");
       }
     } else {
-      $v = ['mensaje' => 'Error al procesar la solicitud', 'codigo' => 404];
+   
+      header("HTTP/1.1 404 Error al procesar la solicitud");
+      
     }
     return $v;
   }
