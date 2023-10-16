@@ -1,6 +1,6 @@
 <?php
 
-
+require_once './Constantes.php';
 
 
 class Conexion
@@ -11,7 +11,7 @@ class Conexion
     {
         $conexion = new mysqli(Constantes::$DIRECCION, Constantes::$USER, Constantes::$PSWD, Constantes::$BDNAME);
         $admin = true;
-        $consulta = "SELECT admin FROM usuario WHERE id = ? ";
+        $consulta = "SELECT admin FROM " .Constantes::$TABLEUSER. " WHERE id = ? ";
         $stmt = $conexion->prepare($consulta);
         $stmt->bind_param("i", $id);
         $stmt->execute();
@@ -31,7 +31,7 @@ class Conexion
         $conexion = new mysqli(Constantes::$DIRECCION, Constantes::$USER, Constantes::$PSWD, Constantes::$BDNAME);
 
         $consulta =
-            "SELECT COUNT(*), id FROM usuario WHERE nombre = ? AND password = ? GROUP BY id";
+            "SELECT COUNT(*), id FROM " .Constantes::$TABLEUSER. " WHERE nombre = ? AND password = ? GROUP BY id";
 
         $stmt = $conexion->prepare($consulta);
         $stmt->bind_param("ss", $user, $password);
@@ -50,7 +50,7 @@ class Conexion
     public static function consultarPartida($user)
     {
         $conexion = new mysqli(Constantes::$DIRECCION, Constantes::$USER, Constantes::$PSWD, Constantes::$BDNAME);
-        $consulta = "SELECT * FROM partida WHERE idUsuario = ? and finalizada = 0";
+        $consulta = "SELECT * FROM " .Constantes::$TABLEMATCH. " WHERE idUsuario = ? and finalizada = 0";
         $stmt = $conexion->prepare($consulta);
         $stmt->bind_param("i", $user);
         $stmt->execute();
@@ -71,7 +71,7 @@ class Conexion
         $m = '';
         $conexion = new mysqli(Constantes::$DIRECCION, Constantes::$USER, Constantes::$PSWD, Constantes::$BDNAME);
 
-        $query = "INSERT INTO partida (idUsuario,tablero,oculto,finalizada) VALUES (?,?,?,?)";
+        $query = "INSERT INTO  " .Constantes::$TABLEMATCH. "  (idUsuario,tablero,oculto,finalizada) VALUES (?,?,?,?)";
 
         $stmt = $conexion->prepare($query);
 
@@ -93,7 +93,7 @@ class Conexion
 
       $conexion = new mysqli(Constantes::$DIRECCION, Constantes::$USER, Constantes::$PSWD, Constantes::$BDNAME);
         $t = $p->terminado;
-        $query = "UPDATE partida SET finalizada = ? WHERE id = ?;";
+        $query = "UPDATE  " .Constantes::$TABLEMATCH. "  SET finalizada = ? WHERE id = ?;";
         $stmt = $conexion->prepare($query);
         $stmt->bind_param("ii", $t, $p->id);
         $stmt->execute();
@@ -109,7 +109,7 @@ class Conexion
     {
 
         $conexion = new mysqli(Constantes::$DIRECCION, Constantes::$USER, Constantes::$PSWD, Constantes::$BDNAME);
-        $query = "UPDATE partida SET oculto = ?, tablero = ? WHERE id= ?;";
+        $query = "UPDATE  " .Constantes::$TABLEMATCH. "  SET oculto = ?, tablero = ? WHERE id= ?;";
         $stmt = $conexion->prepare($query);
         $stmt->bind_param("ssi", $p->oculto, $p->tablero, $p->id);
         $stmt->execute();
@@ -123,7 +123,7 @@ class Conexion
     {
         $conexion = new mysqli(Constantes::$DIRECCION, Constantes::$USER, Constantes::$PSWD, Constantes::$BDNAME);
         $v = [];
-        $query = "SELECT COUNT(*) FROM partida WHERE finalizada = 0 and idUsuario= ?";
+        $query = "SELECT COUNT(*) FROM  " .Constantes::$TABLEMATCH. "  WHERE finalizada = 0 and idUsuario= ?";
         $stmt = $conexion->prepare($query);
         $stmt->bind_param('i',$user);
         $stmt->execute();
@@ -146,7 +146,7 @@ class Conexion
     {
 
         $conexion = new mysqli(Constantes::$DIRECCION, Constantes::$USER, Constantes::$PSWD, Constantes::$BDNAME);
-        $query = "UPDATE usuario SET partidasGanadas = partidasGanadas + 1 WHERE id= ? ;";
+        $query = "UPDATE " .Constantes::$TABLEUSER. " SET partidasGanadas = partidasGanadas + 1 WHERE id= ? ;";
         $stmt = $conexion->prepare($query);
         $stmt->bind_param("i", $u);
         $stmt->execute();
@@ -157,7 +157,7 @@ class Conexion
     {
 
         $conexion = new mysqli(Constantes::$DIRECCION, Constantes::$USER, Constantes::$PSWD, Constantes::$BDNAME);
-        $query = "UPDATE usuario SET partidasJugadas = partidasJugadas +1 WHERE id= ? ;";
+        $query = "UPDATE " .Constantes::$TABLEUSER. " SET partidasJugadas = partidasJugadas +1 WHERE id= ? ;";
         $stmt = $conexion->prepare($query);
         $stmt->bind_param("i", $u);
         $stmt->execute();
@@ -168,7 +168,7 @@ class Conexion
     {
         $v = [];
         $conexion = new mysqli(Constantes::$DIRECCION, Constantes::$USER, Constantes::$PSWD, Constantes::$BDNAME);
-        $query = "SELECT nombre, partidasGanadas, partidasJugadas FROM usuario ORDER BY partidasGanadas DESC;";
+        $query = "SELECT nombre, partidasGanadas, partidasJugadas FROM " .Constantes::$TABLEUSER. " ORDER BY partidasGanadas DESC;";
         $stmt = $conexion->prepare($query);
         $stmt->execute();
         $resultados = $stmt->get_result();
@@ -185,7 +185,7 @@ class Conexion
     {
         $id = $p->id;
         $conexion = new mysqli(Constantes::$DIRECCION, Constantes::$USER, Constantes::$PSWD, Constantes::$BDNAME);
-        $query = "UPDATE partida SET finalizada =  -1 WHERE id= ? ;";
+        $query = "UPDATE  " .Constantes::$TABLEMATCH. "  SET finalizada =  -1 WHERE id= ? ;";
         $stmt = $conexion->prepare($query);
         $stmt->bind_param("i", $id);
         $stmt->execute();
@@ -197,7 +197,7 @@ class Conexion
 
         $m = '';
         $conexion = new mysqli(Constantes::$DIRECCION, Constantes::$USER, Constantes::$PSWD, Constantes::$BDNAME);
-        $query = "INSERT INTO usuario (password, nombre, admin) VALUES (?,?,?)";
+        $query = "INSERT INTO " .Constantes::$TABLEUSER. " (password, nombre, admin) VALUES (?,?,?)";
 
         $stmt = $conexion->prepare($query);
 
@@ -216,7 +216,7 @@ class Conexion
     static function consultarUsuarioPorNombre($user)
     {
         $conexion = new mysqli(Constantes::$DIRECCION, Constantes::$USER, Constantes::$PSWD, Constantes::$BDNAME);
-        $consulta = "SELECT * FROM usuario WHERE nombre= ? ";
+        $consulta = "SELECT * FROM " .Constantes::$TABLEUSER. " WHERE nombre= ? ";
         $stmt = $conexion->prepare($consulta);
         $stmt->bind_param("s", $user);
         $stmt->execute();
@@ -237,7 +237,7 @@ class Conexion
     static function consultarTodosUsuario()
     {
         $conexion = new mysqli(Constantes::$DIRECCION, Constantes::$USER, Constantes::$PSWD, Constantes::$BDNAME);
-        $consulta = "SELECT * FROM usuario";
+        $consulta = "SELECT * FROM " .Constantes::$TABLEUSER. "";
         $stmt = $conexion->prepare($consulta);
 
         $stmt->execute();
@@ -261,7 +261,7 @@ class Conexion
     {
         $v = [];
         $conexion = new mysqli(Constantes::$DIRECCION, Constantes::$USER, Constantes::$PSWD, Constantes::$BDNAME);
-        $query = "UPDATE usuario SET password =  ? WHERE nombre = ? ;";
+        $query = "UPDATE " .Constantes::$TABLEUSER. " SET password =  ? WHERE nombre = ? ;";
         $stmt = $conexion->prepare($query);
         $stmt->bind_param("ss", $password, $user);
         $stmt->execute();
@@ -280,7 +280,7 @@ class Conexion
     {
         $v = [];
         $conexion = new mysqli(Constantes::$DIRECCION, Constantes::$USER, Constantes::$PSWD, Constantes::$BDNAME);
-        $query = "DELETE FROM usuario  WHERE nombre = ? ;";
+        $query = "DELETE FROM " .Constantes::$TABLEUSER. "  WHERE nombre = ? ;";
         $stmt = $conexion->prepare($query);
         $stmt->bind_param("s", $user);
         try {
