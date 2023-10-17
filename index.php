@@ -8,6 +8,7 @@ require_once './Clases/Usuario.php';
 require_once './Constantes.php';
 require_once './Controladores/ControladorAdmin.php';
 require_once './Controladores/ControladorUsuario.php';
+
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 
@@ -27,121 +28,142 @@ $datos = json_decode($json);
 $accion;
 
 if ($requestMethod == 'GET') {
-    $u = $datos->usuario;
-    $p = $datos->password;
-    $accion = ControladorUsuario::Login($u, $p);
-    if ($argus[1] == 'ranking' && $accion['codigo']==200) {
-        $accion = ControladorUsuario::mostrarRanking();
-
+    if (count($argus) > 1) {
+        header("HTTP/1.1 400 Demasiados argumentos");
     } else {
-        if ($accion['codigo'] != 200) {
-
-        } else {
-            $user = $accion['usuario'];
-            if ($argus[1] == 'consultar') {
-
-                $accion = ControladorAdmin::validarAdmin($user);
-
-                if ($accion['admin']) {
-                    if (count($argus) > 1) {
-                        $accion = ControladorAdmin::listarUnUsuario($argus[2]);
-                    } else {
-                        $accion = ControladorAdmin::listarTodosUsuarios();
-                    }
-                }
-            } else {
-                $accion = ControladorMina::partidaPendienteExiste($accion['usuario']);
-                if ($accion['codigo'] != 200) {
-                    if (count($argus) == 1) {
-
-                        $accion = ControladorMina::nuevaPartida(Constantes::$TABLERODEFAULT, Constantes::$MINASDEFAULT, $accion['usuario']);
-        
-                    } else {
-                        $accion = ControladorMina::nuevaPartida((int)$argus[1], (int)$argus[2], $accion['usuario']);
-
-                    }
-                } else {
-                    $p = ControladorMina::obtenerPartida($user);
-                     ControladorMina::mostrarPartida($p);
-                }
-            }
-        }
-    }
-}
-if ($requestMethod == 'POST') {
-    $accion = ControladorUsuario::Login($datos->usuario, $datos->password);
-
-    if ($accion['codigo'] != 200) {
-
-    } else {
-        $user = $accion['usuario'];
-
-        if ($argus[1] == 'nuevo') {
-
-            $accion = ControladorAdmin::validarAdmin($user);
-
-            if ($accion['admin']) {
-
-                $accion = ControladorAdmin::registrarUsuario($datos->nuevoPassword, $datos->nuevoNombre, $datos->adm);
-            }
-        } else {
-            $accion = ControladorMina::partidaPendienteExiste($user);
-    
-            if ($accion['codigo'] == 200) {
-
-                $p = ControladorMina::obtenerPartida($user);
-                
-                if ($argus[1] == 'rendicion') {
-                    $accion = ControladorMina::rendicion($user, $p);
-                  
-                
-                } else {
-                    $accion = ControladorMina::juegaRonda($p, $datos->casilla, $user);
-                    
-                }
-            } else {
-                $cod = $accion['codigo'];
-                $mensaje = $accion['mensaje'];
-                header("HTTP/1.1 " . $cod . ' ' . $mensaje);
-            }
-        }
-    }
-            
-}
-
-if ($requestMethod == 'PUT') {
-    if ($argus[1] == 'recuperacion') {
-        $email = $datos->email;
         $u = $datos->usuario;
-        $accion = ControladorUsuario::recuperarCuenta($email, $u);
+        $p = $datos->password;
+        $accion = ControladorUsuario::Login($u, $p);
+        if ($argus[1] == 'ranking' && $accion['codigo'] == 200) {
+            $accion = ControladorUsuario::mostrarRanking();
+        } else {
+            if ($accion['codigo'] != 200) {
+            } else {
+                $user = $accion['usuario'];
+                if ($argus[1] == 'consultar') {
+
+                    $accion = ControladorAdmin::validarAdmin($user);
+
+                    if ($accion['admin']) {
+                        if (count($argus) > 1) {
+                            $accion = ControladorAdmin::listarUnUsuario($argus[2]);
+                        } else {
+                            $accion = ControladorAdmin::listarTodosUsuarios();
+                        }
+                    }
+                } else {
+                    $accion = ControladorMina::partidaPendienteExiste($accion['usuario']);
+                    if ($accion['codigo'] != 200) {
+                        if (count($argus) == 1) {
+
+                            $accion = ControladorMina::nuevaPartida(Constantes::$TABLERODEFAULT, Constantes::$MINASDEFAULT, $accion['usuario']);
+                        } else {
+                            if((int)$argus[1]==0 ||(int)$argus[2]==0 || (int)$argus[2]>(int)$argus[1]){
+                               
+                            }else{
+                                if((int)$argus[1]>30){
+                                    header("HTTP/1.1 400 Tamaño de tablero incorrecto");
+                                }else{
+                                    $accion = ControladorMina::nuevaPartida((int)$argus[1], (int)$argus[2], $accion['usuario']);
+                                }
+                            }
+                        }
+                    } else {
+                        $p = ControladorMina::obtenerPartida($user);
+                        ControladorMina::mostrarPartida($p);
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+if ($requestMethod == 'POST') {
+    if (count($argus) > 1) {
+        header("HTTP/1.1 400 Demasiados Argumentos");
     } else {
         $accion = ControladorUsuario::Login($datos->usuario, $datos->password);
 
         if ($accion['codigo'] != 200) {
-            
         } else {
             $user = $accion['usuario'];
-            $accion = ControladorAdmin::validarAdmin($user);
-            if ($accion['admin']) {
-                $u = $datos->usuarioUpdate;
-                $p = $datos->passwordUpdate;
-                $accion = ControladorAdmin::cambiarPassword($u, $p,0);
+
+            if ($argus[1] == 'nuevo') {
+
+                $accion = ControladorAdmin::validarAdmin($user);
+
+                if ($accion['admin']) {
+
+                    $accion = ControladorAdmin::registrarUsuario($datos->nuevoPassword, $datos->nuevoNombre, $datos->adm);
+                }
+            } else {
+                $accion = ControladorMina::partidaPendienteExiste($user);
+
+                if ($accion['codigo'] == 200) {
+
+                    $p = ControladorMina::obtenerPartida($user);
+
+                    if ($argus[1] == 'rendicion') {
+                        $accion = ControladorMina::rendicion($user, $p);
+                    } else {
+                        $accion = ControladorMina::juegaRonda($p, $datos->casilla, $user);
+                    }
+                } else {
+                    $cod = $accion['codigo'];
+                    $mensaje = $accion['mensaje'];
+                    header("HTTP/1.1 " . $cod . ' ' . $mensaje);
+                }
             }
         }
     }
 }
 
-if ($requestMethod == 'DELETE') {
-    $accion = ControladorUsuario::Login($datos->usuario, $datos->password);
 
-    if ($accion['codigo'] != 200) {
-       
+if ($requestMethod == 'PUT') {
+    if (count($argus) > 1) {
+        header("HTTP/1.1 400 Demasiados Argumentos");
     } else {
-        $user = $accion['usuario'];
-        $accion = ControladorAdmin::validarAdmin($user);
-        if ($accion['admin']) {
-            $u = $datos->usuarioDelete;
-            $accion = ControladorAdmin::eliminarUsuario($u);
+        if ($argus[1] == 'recuperacion') {
+            $email = $datos->email;
+            $u = $datos->usuario;
+            $accion = ControladorUsuario::recuperarCuenta($email, $u);
+        } else {
+            $accion = ControladorUsuario::Login($datos->usuario, $datos->password);
+
+            if ($accion['codigo'] != 200) {
+            } else {
+                $user = $accion['usuario'];
+                $accion = ControladorAdmin::validarAdmin($user);
+                if ($accion['admin']) {
+                    $u = $datos->usuarioUpdate;
+                    $p = $datos->passwordUpdate;
+                    $accion = ControladorAdmin::cambiarPassword($u, $p, 0);
+                }
+            }
         }
     }
+}
+
+
+if ($requestMethod == 'DELETE') {
+    if (count($argus) > 1) {
+        header("HTTP/1.1 400 Demasiados Argumentos");
+    } else {
+
+        $accion = ControladorUsuario::Login($datos->usuario, $datos->password);
+
+        if ($accion['codigo'] != 200) {
+        } else {
+            $user = $accion['usuario'];
+            $accion = ControladorAdmin::validarAdmin($user);
+            if ($accion['admin']) {
+                $u = $datos->usuarioDelete;
+                $accion = ControladorAdmin::eliminarUsuario($u);
+            }
+        }
+    }
+}
+if($requestMethod !='DELETE' && $requestMethod !='PUT' && $requestMethod !='POST' && $requestMethod!='GET'){
+    header("HTTP/1.1 405 Verbo No Soportado");
 }
