@@ -14,7 +14,10 @@ class Partida{
         $this->oculto=$o;
         $this->terminado=$te;
     }
-
+public function tamTablero(){
+	$split=str_split($this->oculto);
+	return count($split);
+}
 	public function getId() {
 		return $this->id;
 	}

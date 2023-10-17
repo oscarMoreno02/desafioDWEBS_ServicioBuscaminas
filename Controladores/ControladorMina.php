@@ -51,7 +51,9 @@ class ControladorMina
   }
   public static function juegaRonda($partida, $casilla, $user)
   {
-    $v = ['mensaje' => 'error al jugar', 'codigo' => 400];
+  if($partida->tamTablero()<$casilla){
+    header("HTTP/1.1 400 Casilla no valida para jugar");
+  }else{
     if ($partida->abrirCasilla($casilla) == 0) {
 
 
@@ -75,7 +77,7 @@ class ControladorMina
         echo json_encode(['partida' => $partida->oculto]);
       }
     }
-
+  }
 
   }
   

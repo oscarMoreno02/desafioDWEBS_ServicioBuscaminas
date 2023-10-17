@@ -28,7 +28,7 @@ $datos = json_decode($json);
 $accion;
 
 if ($requestMethod == 'GET') {
-    if (count($argus) > 1) {
+    if (count($argus) > 2) {
         header("HTTP/1.1 400 Demasiados argumentos");
     } else {
         $u = $datos->usuario;
@@ -55,11 +55,15 @@ if ($requestMethod == 'GET') {
                     $accion = ControladorMina::partidaPendienteExiste($accion['usuario']);
                     if ($accion['codigo'] != 200) {
                         if (count($argus) == 1) {
-
-                            $accion = ControladorMina::nuevaPartida(Constantes::$TABLERODEFAULT, Constantes::$MINASDEFAULT, $accion['usuario']);
+                            if($argus[1]>0){
+                                print_r($argus[1]);
+                                header("HTTP/1.1 400 Parametros incorrectos");
+                            }else{
+                                $accion = ControladorMina::nuevaPartida(Constantes::$TABLERODEFAULT, Constantes::$MINASDEFAULT, $accion['usuario']);
+                            }
                         } else {
                             if((int)$argus[1]==0 ||(int)$argus[2]==0 || (int)$argus[2]>(int)$argus[1]){
-                               
+                                header("HTTP/1.1 400 Parametros incorrectos");
                             }else{
                                 if((int)$argus[1]>30){
                                     header("HTTP/1.1 400 Tamaño de tablero incorrecto");
